@@ -3,11 +3,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CosmicBackground } from './components/ui';
 import Sidebar from './components/Sidebar';
 import LoginPage from './pages/LoginPage';
-import GoogleOAuthCallbackPage from './pages/GoogleOAuthCallbackPage';
+import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
+import HackathonPage from './pages/HackathonPage';
+import AntiCheatPage from './pages/AntiCheatPage';
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
@@ -17,21 +19,13 @@ function ProtectedLayout() {
       <>
         <CosmicBackground />
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          position: 'relative',
-          zIndex: 1,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          minHeight: '100vh', position: 'relative', zIndex: 1,
         }}>
           <div style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 24,
-            fontWeight: 700,
+            fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700,
             background: 'var(--gradient-primary)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
           }}>
             GitTracker
           </div>
@@ -71,7 +65,10 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login/google/callback" element={<GoogleOAuthCallbackPage />} />
+          {/* Landing page — always public at /Home */}
+          <Route path="/Home" element={<LandingPage />} />
+          <Route path="/home" element={<Navigate to="/Home" replace />} />
+          <Route path="/" element={<Navigate to="/Home" replace />} />
 
           {/* Public routes */}
           <Route element={<PublicRoute />}>
@@ -84,10 +81,12 @@ export default function App() {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/hackathon" element={<HackathonPage />} />
+            <Route path="/anti-cheat" element={<AntiCheatPage />} />
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/Home" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

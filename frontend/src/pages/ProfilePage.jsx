@@ -1,10 +1,52 @@
-import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { studentAPI } from '../services/api';
 import {
   TierBadge, Avatar, ProgressBar, CircularProgress,
-  LoadingCards, EmptyState,
 } from '../components/ui';
+
+/* ── Dummy score explanation data for the admin user ── */
+const DUMMY_EXPLANATION = {
+  available: true,
+  rank: { score: 8420, tierRank: 'Elite', leaderboardRank: 1 },
+  formula: {
+    scoreVersion: 'v2.1.0',
+    rawTotal: 9850,
+    totalAfterDecay: 8680,
+    totalScore: 8420,
+    qualityScore: 0.87,
+    effectiveCommits: 1420,
+    components: {
+      PAS: 4200,
+      OCS: 3100,
+      PIS: 1250,
+      CIS: 950,
+      SDS: 180,
+    },
+    qualityBreakdown: {
+      volumeScore: 0.92,
+      diversityScore: 0.78,
+      prAssociationScore: 0.85,
+      antiSpamScore: 0.95,
+      weights: { volume: 0.3, diversity: 0.25, prAssociation: 0.25, antiSpam: 0.2 },
+    },
+    decay: {
+      daysSinceActivity: 2,
+      decayFactor: 0.96,
+      expression: 'decay_factor = 1 / log(days_since + 2) with safety clamp [0.2, 1.0]',
+    },
+  },
+  capsApplied: {
+    'PAS.commits': 5000,
+    'CIS.followers': 2000,
+    'SDS.languages': 20,
+  },
+  antiCheat: {
+    isFlagged: false,
+    flags: [],
+  },
+  transparency: {
+    source: 'Scores derived from GitHub metadata only. No source code is stored or analyzed.',
+  },
+};
 
 function formatNumber(n) {
   if (n === undefined || n === null) return '—';
@@ -13,48 +55,9 @@ function formatNumber(n) {
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [explanation, setExplanation] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [exRes, profRes] = await Promise.allSettled([
-          studentAPI.getScoreExplanation(),
-          studentAPI.getProfile(),
-        ]);
-        if (exRes.status === 'fulfilled') setExplanation(exRes.value.data);
-        if (profRes.status === 'fulfilled') {
-          setProfile(profRes.value.data.student);
-          setStats(profRes.value.data.stats);
-        }
-      } catch {
-        // handled
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
-
-  if (loading) return <LoadingCards count={5} />;
-
-  const ex = explanation;
-  const p = profile || user;
-  const s = stats;
-
-  if (!ex?.available) {
-    return (
-      <EmptyState
-        icon="📊"
-        title="No Score Data Yet"
-        text="Sync your GitHub profile first to see your detailed score breakdown and explainability."
-      />
-    );
-  }
-
+  const ex = DUMMY_EXPLANATION;
+  const p = user;
   const formula = ex.formula || {};
   const components = formula.components || {};
   const quality = formula.qualityBreakdown || {};
@@ -79,13 +82,8 @@ export default function ProfilePage() {
               <span className="pill">{p?.branch}</span>
               <span className="pill">Year {p?.year}</span>
               {p?.githubUsername && (
-                <a
-                  href={`https://github.com/${p.githubUsername}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="pill pill--active"
-                  style={{ textDecoration: 'none' }}
-                >
+                <a href={`https://github.com/${p.githubUsername}`} target="_blank" rel="noopener noreferrer"
+                  className="pill pill--active" style={{ textDecoration: 'none' }}>
                   @{p.githubUsername} ↗
                 </a>
               )}
@@ -115,49 +113,23 @@ export default function ProfilePage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {[
-              {
-                key: 'PAS', label: 'Productivity & Activity',
-                desc: `commits×1 + 30d_contrib×2 + streak×1`,
-                max: 6000, color: '#81ecff',
-              },
-              {
-                key: 'OCS', label: 'Open-Source Collaboration',
-                desc: `PRs×5 + merged×15 + issues×8 + reviews×4`,
-                max: 6500, color: '#d674ff',
-              },
-              {
-                key: 'PIS', label: 'Project Impact',
-                desc: `repos×5 + log(stars) + log(forks) + watchers×2`,
-                max: 1500, color: '#ff6b98',
-              },
-              {
-                key: 'CIS', label: 'Community Influence',
-                desc: `followers×2`,
-                max: 4000, color: '#00d4ec',
-              },
-              {
-                key: 'SDS', label: 'Skill Diversity',
-                desc: `languages×10`,
-                max: 200, color: '#fbbf24',
-              },
+              { key: 'PAS', label: 'Productivity & Activity', desc: 'commits×1 + 30d_contrib×2 + streak×1', max: 6000, color: '#81ecff' },
+              { key: 'OCS', label: 'Open-Source Collaboration', desc: 'PRs×5 + merged×15 + issues×8 + reviews×4', max: 6500, color: '#d674ff' },
+              { key: 'PIS', label: 'Project Impact', desc: 'repos×5 + log(stars) + log(forks) + watchers×2', max: 1500, color: '#ff6b98' },
+              { key: 'CIS', label: 'Community Influence', desc: 'followers×2', max: 4000, color: '#00d4ec' },
+              { key: 'SDS', label: 'Skill Diversity', desc: 'languages×10', max: 200, color: '#fbbf24' },
             ].map(({ key, label, desc, max, color }) => (
               <div key={key}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                   <div>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 13, color }}>
-                      {key}
-                    </span>
-                    <span style={{ marginLeft: 8, fontSize: 13, color: 'var(--on-surface)' }}>
-                      {label}
-                    </span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 13, color }}>{key}</span>
+                    <span style={{ marginLeft: 8, fontSize: 13, color: 'var(--on-surface)' }}>{label}</span>
                   </div>
                   <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 15 }}>
                     {formatNumber(components[key])}
                   </span>
                 </div>
-                <div style={{ fontSize: 11, color: 'var(--outline)', fontFamily: 'var(--font-mono)', marginBottom: 4 }}>
-                  {desc}
-                </div>
+                <div style={{ fontSize: 11, color: 'var(--outline)', fontFamily: 'var(--font-mono)', marginBottom: 4 }}>{desc}</div>
                 <ProgressBar value={components[key] || 0} max={max} size="sm" />
               </div>
             ))}
@@ -165,28 +137,16 @@ export default function ProfilePage() {
             {/* Raw vs Decayed totals */}
             <div style={{ display: 'flex', gap: 24, marginTop: 8, paddingTop: 16, borderTop: '1px solid var(--glass-border)' }}>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', textTransform: 'uppercase' }}>
-                  Raw Total
-                </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 700 }}>
-                  {formatNumber(formula.rawTotal)}
-                </div>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', textTransform: 'uppercase' }}>Raw Total</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 700 }}>{formatNumber(formula.rawTotal)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', textTransform: 'uppercase' }}>
-                  After Decay
-                </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 700, color: 'var(--primary)' }}>
-                  {formatNumber(formula.totalAfterDecay)}
-                </div>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', textTransform: 'uppercase' }}>After Decay</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 700, color: 'var(--primary)' }}>{formatNumber(formula.totalAfterDecay)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', textTransform: 'uppercase' }}>
-                  Final Score
-                </div>
-                <div className="score-value" style={{ fontSize: 20 }}>
-                  {formatNumber(formula.totalScore)}
-                </div>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', textTransform: 'uppercase' }}>Final Score</div>
+                <div className="score-value" style={{ fontSize: 20 }}>{formatNumber(formula.totalScore)}</div>
               </div>
             </div>
           </div>
@@ -200,12 +160,8 @@ export default function ProfilePage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 16 }}>
             <CircularProgress value={formula.qualityScore || 0} max={1} size={90} />
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--on-surface-variant)' }}>
-                Effective Commits
-              </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 700 }}>
-                {formatNumber(formula.effectiveCommits)}
-              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--on-surface-variant)' }}>Effective Commits</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 700 }}>{formatNumber(formula.effectiveCommits)}</div>
             </div>
           </div>
 
@@ -238,9 +194,7 @@ export default function ProfilePage() {
           </div>
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 16 }}>
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 36, fontWeight: 700 }}>
-                {decay.daysSinceActivity ?? 0}
-              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 36, fontWeight: 700 }}>{decay.daysSinceActivity ?? 0}</div>
               <div className="score-label">Days Since Activity</div>
             </div>
             <div>
@@ -251,12 +205,8 @@ export default function ProfilePage() {
             </div>
           </div>
           <div style={{
-            padding: '12px 16px',
-            background: 'rgba(13,19,35,0.4)',
-            borderRadius: 12,
-            fontFamily: 'var(--font-mono)',
-            fontSize: 12,
-            color: 'var(--outline)',
+            padding: '12px 16px', background: 'rgba(13,19,35,0.4)', borderRadius: 12,
+            fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--outline)',
           }}>
             {decay.expression || 'decay_factor = 1 / log(days_since + 2) with safety clamp [0.2, 1.0]'}
           </div>
@@ -282,12 +232,8 @@ export default function ProfilePage() {
           ) : (
             <div style={{ textAlign: 'center', padding: '24px 0' }}>
               <div style={{ fontSize: 40, marginBottom: 8 }}>🛡</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--success)' }}>
-                No Flags Detected
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 4 }}>
-                Your contribution patterns appear organic
-              </div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--success)' }}>No Flags Detected</div>
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 4 }}>Your contribution patterns appear organic</div>
             </div>
           )}
         </div>
@@ -324,15 +270,9 @@ export default function ProfilePage() {
 
       {/* Transparency Note */}
       <div style={{
-        marginTop: 32,
-        padding: '16px 20px',
-        borderRadius: 14,
-        background: 'rgba(13,19,35,0.3)',
-        border: '1px solid var(--glass-border)',
-        fontSize: 12,
-        color: 'var(--outline)',
-        textAlign: 'center',
-        fontFamily: 'var(--font-label)',
+        marginTop: 32, padding: '16px 20px', borderRadius: 14,
+        background: 'rgba(13,19,35,0.3)', border: '1px solid var(--glass-border)',
+        fontSize: 12, color: 'var(--outline)', textAlign: 'center', fontFamily: 'var(--font-label)',
       }}>
         {ex.transparency?.source || 'Scores derived from GitHub metadata only. No source code is stored.'}
       </div>
