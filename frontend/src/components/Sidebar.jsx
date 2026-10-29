@@ -1,25 +1,28 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Avatar, TierBadge } from './ui';
+import { Avatar } from './ui';
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
-  const location = useLocation();
+  const isAdmin = user?.role === 'admin';
 
   const navItems = [
+    { to: '/Home', label: 'Home', icon: '⌂', end: true },
     { to: '/dashboard', label: 'Dashboard', icon: '◈' },
     { to: '/leaderboard', label: 'Leaderboard', icon: '⬡' },
     { to: '/profile', label: 'Score Details', icon: '◎' },
+    { to: '/hackathon', label: 'Hackathon Manager', icon: '🏆' },
+    { to: '/anti-cheat', label: 'Anti-Cheat 🛡️', icon: '🛡️' },
     { to: '/settings', label: 'Settings', icon: '⚙' },
   ];
 
   return (
     <nav className="sidebar">
       {/* Logo */}
-      <div className="sidebar__logo">
+      <NavLink to="/Home" className="sidebar__logo" style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="sidebar__logo-icon">G</div>
         <div className="sidebar__logo-text">GitTracker</div>
-      </div>
+      </NavLink>
 
       {/* Navigation */}
       <div className="sidebar__nav">
@@ -27,6 +30,7 @@ export default function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.end}
             className={({ isActive }) =>
               `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`
             }
@@ -36,6 +40,20 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </div>
+
+      {/* Admin badge */}
+      {isAdmin && (
+        <div style={{
+          margin: '8px 12px', padding: '6px 12px',
+          background: 'rgba(214,116,255,0.08)',
+          border: '1px solid rgba(214,116,255,0.2)',
+          borderRadius: 8, fontSize: 11, fontWeight: 700,
+          color: '#d674ff', fontFamily: 'var(--font-label)',
+          textAlign: 'center', letterSpacing: '0.06em',
+        }}>
+          ⚡ ADMIN MODE
+        </div>
+      )}
 
       {/* User section */}
       {user && (

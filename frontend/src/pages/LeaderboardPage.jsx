@@ -1,64 +1,35 @@
-import { useState, useEffect, useCallback } from 'react';
-import { leaderboardAPI } from '../services/api';
-import { TierBadge, RankDelta, Avatar, LoadingCards, EmptyState } from '../components/ui';
+import { useState, useMemo } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { TierBadge, Avatar } from '../components/ui';
 
 function formatNumber(n) {
   if (n === undefined || n === null) return '—';
   return n.toLocaleString();
 }
 
-const BRANCHES = ['All', 'CSE', 'IT', 'ECE', 'ME', 'CV'];
+const BRANCHES = ['All', 'Computer Science', 'Electronics', 'Information Technology'];
 const YEARS = ['All', '1', '2', '3', '4'];
 const TIERS = ['All', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Elite'];
 
 export default function LeaderboardPage() {
-  const [students, setStudents] = useState([]);
-  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
-  const [myPosition, setMyPosition] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ branch: '', year: '', tier: '', page: 1 });
-
-  const fetchLeaderboard = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = { page: filters.page, limit: 20 };
-      if (filters.branch) params.branch = filters.branch;
-      if (filters.year) params.year = filters.year;
-      if (filters.tier) params.tier = filters.tier;
-
-      const [lbRes, posRes] = await Promise.allSettled([
-        leaderboardAPI.getLeaderboard(params),
-        leaderboardAPI.getMyPosition(),
-      ]);
-
-      if (lbRes.status === 'fulfilled') {
-        setStudents(lbRes.value.data.students || []);
-        setPagination(lbRes.value.data.pagination || {});
-      }
-      if (posRes.status === 'fulfilled') {
-        setMyPosition(posRes.value.data);
-      }
-    } catch {
-      // handled
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
-
-  useEffect(() => {
-    fetchLeaderboard();
-  }, [fetchLeaderboard]);
+  const { users } = useAuth();
+  const [filters, setFilters] = useState({ branch: '', year: '', tier: '' });
 
   const setFilter = (key, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value === 'All' ? '' : value,
-      page: 1,
-    }));
+    setFilters(prev => ({ ...prev, [key]: value === 'All' ? '' : value }));
   };
 
-  const top3 = students.slice(0, filters.page === 1 ? 3 : 0);
-  const rest = filters.page === 1 ? students.slice(3) : students;
+  /* Sort and filter from the demo user list */
+  const sorted = useMemo(() => {
+    let list = [...(users || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
+    if (filters.branch) list = list.filter(u => u.branch === filters.branch);
+    if (filters.year) list = list.filter(u => String(u.year) === filters.year);
+    if (filters.tier) list = list.filter(u => u.tierRank === filters.tier);
+    return list.map((u, i) => ({ ...u, displayRank: i + 1 }));
+  }, [users, filters]);
+
+  const top3 = sorted.slice(0, 3);
+  const rest = sorted.slice(3);
 
   return (
     <div className="fade-in">
@@ -66,70 +37,53 @@ export default function LeaderboardPage() {
       <div className="page-header">
         <h1 className="page-header__title">Leaderboard</h1>
         <p className="page-header__subtitle">
-          {pagination.total} students ranked by contribution score
+          {sorted.length} students ranked by contribution score
         </p>
       </div>
 
       {/* Filters */}
-      <div className="filter-bar" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <span style={{ fontSize: 13, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', width: '70px', fontWeight: 600 }}>
-            • BRANCH
-          </span>
-          {BRANCHES.map(b => (
-            <button
-              key={b}
-              className={`pill pill--clickable ${((!filters.branch && b === 'All') || filters.branch === b) ? 'pill--active' : ''}`}
-              onClick={() => setFilter('branch', b)}
-            >
-              {b}
-            </button>
-          ))}
-        </div>
+      <div className="filter-bar">
+        <span style={{ fontSize: 12, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', marginRight: 4 }}>
+          BRANCH
+        </span>
+        {BRANCHES.map(b => (
+          <button key={b}
+            className={`pill pill--clickable ${((!filters.branch && b === 'All') || filters.branch === b) ? 'pill--active' : ''}`}
+            onClick={() => setFilter('branch', b)}
+          >{b}</button>
+        ))}
 
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <span style={{ fontSize: 13, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', width: '70px', fontWeight: 600 }}>
-            • YEAR
-          </span>
-          {YEARS.map(y => (
-            <button
-              key={y}
-              className={`pill pill--clickable ${((!filters.year && y === 'All') || filters.year === y) ? 'pill--active' : ''}`}
-              onClick={() => setFilter('year', y)}
-            >
-              {y === 'All' ? 'All' : `Y${y}`}
-            </button>
-          ))}
-        </div>
+        <span style={{ fontSize: 12, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', marginLeft: 12, marginRight: 4 }}>
+          YEAR
+        </span>
+        {YEARS.map(y => (
+          <button key={y}
+            className={`pill pill--clickable ${((!filters.year && y === 'All') || filters.year === y) ? 'pill--active' : ''}`}
+            onClick={() => setFilter('year', y)}
+          >{y === 'All' ? 'All' : `Y${y}`}</button>
+        ))}
 
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <span style={{ fontSize: 13, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', width: '70px', fontWeight: 600 }}>
-            • TIER
-          </span>
-          {TIERS.map(t => (
-            <button
-              key={t}
-              className={`pill pill--clickable ${((!filters.tier && t === 'All') || filters.tier === t) ? 'pill--active' : ''}`}
-              onClick={() => setFilter('tier', t)}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+        <span style={{ fontSize: 12, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', marginLeft: 12, marginRight: 4 }}>
+          TIER
+        </span>
+        {TIERS.map(t => (
+          <button key={t}
+            className={`pill pill--clickable ${((!filters.tier && t === 'All') || filters.tier === t) ? 'pill--active' : ''}`}
+            onClick={() => setFilter('tier', t)}
+          >{t}</button>
+        ))}
       </div>
 
-      {loading ? (
-        <LoadingCards count={4} />
-      ) : students.length === 0 ? (
-        <EmptyState
-          icon="🏆"
-          title="No Students Found"
-          text="No scored students match the current filters. Try adjusting your filters."
-        />
+      {sorted.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🏆</div>
+          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>No Students Found</div>
+          <div style={{ fontSize: 14, color: 'var(--on-surface-variant)' }}>No scored students match the current filters. Try adjusting your filters.</div>
+        </div>
       ) : (
         <>
           {/* Podium - Top 3 */}
-          {top3.length > 0 && filters.page === 1 && (
+          {top3.length > 0 && (
             <div className="podium">
               {top3.length > 1 && (
                 <div className="podium__item podium__item--2">
@@ -201,85 +155,6 @@ export default function LeaderboardPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          )}
-
-          {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className="pagination">
-              <button
-                className="pagination__btn"
-                disabled={pagination.page <= 1}
-                onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}
-              >
-                ←
-              </button>
-              {Array.from({ length: Math.min(pagination.totalPages, 7) }, (_, i) => i + 1).map(p => (
-                <button
-                  key={p}
-                  className={`pagination__btn ${p === pagination.page ? 'pagination__btn--active' : ''}`}
-                  onClick={() => setFilters(prev => ({ ...prev, page: p }))}
-                >
-                  {p}
-                </button>
-              ))}
-              <button
-                className="pagination__btn"
-                disabled={pagination.page >= pagination.totalPages}
-                onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
-              >
-                →
-              </button>
-            </div>
-          )}
-
-          {/* My Position */}
-          {myPosition && myPosition.myRank && (
-            <div className="card" style={{ marginTop: 24 }}>
-              <div className="card__header">
-                <span className="card__title">Your Position</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 16 }}>
-                <div>
-                  <div className="rank-display">
-                    <span className="rank-hash">#</span>
-                    <span className="rank-number">{myPosition.myRank}</span>
-                  </div>
-                </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 700, color: 'var(--primary)' }}>
-                  {formatNumber(myPosition.myScore)}
-                </div>
-                <TierBadge tier={myPosition.myTier} />
-              </div>
-              {myPosition.neighbors && (
-                <div style={{ fontSize: 13 }}>
-                  {myPosition.neighbors.map((n, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        padding: '8px 12px',
-                        borderRadius: 10,
-                        background: n.isMe ? 'rgba(129,236,255,0.06)' : 'transparent',
-                        fontWeight: n.isMe ? 600 : 400,
-                        color: n.isMe ? 'var(--primary)' : 'var(--on-surface-variant)',
-                      }}
-                    >
-                      <span style={{ fontFamily: 'var(--font-mono)', width: 32, fontSize: 12 }}>
-                        #{n.rank}
-                      </span>
-                      <Avatar src={n.avatar} alt={n.name} size="sm" />
-                      <span style={{ flex: 1 }}>{n.name}{n.isMe ? ' (You)' : ''}</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>
-                        {formatNumber(n.score)}
-                      </span>
-                      <TierBadge tier={n.tierRank} />
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           )}
         </>
