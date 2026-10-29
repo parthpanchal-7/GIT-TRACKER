@@ -159,3 +159,4 @@ GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 CODEQUIRY_API_KEY=your_codequiry_api_key
 ```
+
