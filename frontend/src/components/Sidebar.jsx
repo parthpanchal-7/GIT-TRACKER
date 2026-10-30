@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Avatar } from './ui';
+import { Avatar, GeometricGMark } from './ui';
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
@@ -12,19 +12,22 @@ export default function Sidebar() {
     { to: '/leaderboard', label: 'Leaderboard', icon: '⬡' },
     { to: '/profile', label: 'Score Details', icon: '◎' },
     { to: '/hackathon', label: 'Hackathon Manager', icon: '🏆' },
-    { to: '/anti-cheat', label: 'Anti-Cheat 🛡️', icon: '🛡️' },
+    { to: '/anti-cheat', label: 'Anti-Cheat Forensics', icon: '🛡️' },
     { to: '/settings', label: 'Settings', icon: '⚙' },
   ];
 
   return (
     <nav className="sidebar">
-      {/* Logo */}
-      <NavLink to="/Home" className="sidebar__logo" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <div className="sidebar__logo-icon">G</div>
-        <div className="sidebar__logo-text">GitTracker</div>
+      {/* Brand Logo & Spec Marker */}
+      <NavLink to="/Home" className="sidebar__logo" title="Return to Home">
+        <GeometricGMark size={36} glow />
+        <div>
+          <div className="sidebar__logo-text">GitTracker</div>
+          <div className="sidebar__logo-sub">SYSTEM SPEC 2.0</div>
+        </div>
       </NavLink>
 
-      {/* Navigation */}
+      {/* Navigation Links */}
       <div className="sidebar__nav">
         {navItems.map((item) => (
           <NavLink
@@ -36,42 +39,50 @@ export default function Sidebar() {
             }
           >
             <span className="sidebar__link-icon">{item.icon}</span>
-            {item.label}
+            <span>{item.label}</span>
           </NavLink>
         ))}
       </div>
 
-      {/* Admin badge */}
+      {/* Admin Telemetry Badge */}
       {isAdmin && (
-        <div style={{
-          margin: '8px 12px', padding: '6px 12px',
-          background: 'rgba(214,116,255,0.08)',
-          border: '1px solid rgba(214,116,255,0.2)',
-          borderRadius: 8, fontSize: 11, fontWeight: 700,
-          color: '#d674ff', fontFamily: 'var(--font-label)',
-          textAlign: 'center', letterSpacing: '0.06em',
-        }}>
-          ⚡ ADMIN MODE
+        <div
+          style={{
+            margin: '8px 12px',
+            padding: '8px 12px',
+            background: 'rgba(191,245,73,0.08)',
+            border: '1px solid rgba(191,245,73,0.25)',
+            borderRadius: 8,
+            fontSize: 10,
+            fontWeight: 800,
+            color: '#BFF549',
+            fontFamily: 'var(--font-mono)',
+            textAlign: 'center',
+            letterSpacing: '0.08em',
+          }}
+        >
+          ⚡ ADMIN MODE ACTIVE
         </div>
       )}
 
-      {/* User section */}
+      {/* User Session Footer */}
       {user && (
         <div className="sidebar__user">
           <Avatar
             src={user.avatar}
             alt={user.name}
             size="sm"
+            tier={user.tier}
           />
-          <div className="sidebar__user-info">
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div className="sidebar__user-name">{user.name}</div>
-            <div className="sidebar__user-id">{user.enrollmentId}</div>
+            <div className="sidebar__user-id">{user.enrollmentId || 'CONTRIBUTOR'}</div>
           </div>
           <button
-            className="btn btn--ghost btn--sm"
+            className="btn-ghost btn-sm"
             onClick={logout}
-            title="Sign out"
-            style={{ padding: '4px 8px', fontSize: 14 }}
+            title="Sign out of session"
+            style={{ padding: '4px 8px', fontSize: 13, color: '#9CA3AF' }}
           >
             ↗
           </button>

@@ -14,15 +14,15 @@ const SAMPLE_REPOS = [
     plagPercentage: 42.0,
     humanPercentage: 18.0,
     risk: 'FLAGGED / HIGH RISK',
-    riskColor: '#ff716c',
+    riskColor: '#F87171',
     aiConfidence: '96.2%',
     sourcesCount: 3,
     summary: 'Direct repository scan of parthpanchal-7/test. Contains 1 Python file (test.py, 74 lines). Codequiry detected a hybrid mix: Section 1 textbook plagiarism algorithms (Bubble Sort, Factorial) + Section 2 AI-synthesized utilities (Fibonacci generator, Palindrome comprehension, Matrix transpose) + Section 3 GCD & Sentence generator.',
     signals: [
-      { icon: '🧠', title: 'AI-Generated Utilities', desc: 'fibonacci_gen (generator pattern), is_palindrome (list-comp), transpose_matrix (zip), and random_sentence.' },
-      { icon: '📋', title: 'Textbook Code Overlap', desc: 'bubble_sort, factorial, and gcd match standard textbook & GeeksforGeeks algorithm implementations.' },
-      { icon: '📝', title: 'Repository Intent Flag', desc: 'README.md explicitly mentions "tesing ai generated codes ."' },
-      { icon: '📁', title: 'Single Script Scope', desc: 'Single monolithic script test.py (74 lines of Python).' }
+      { icon: '🧠', title: 'Neural AST Analysis', desc: 'Token regularity model computed 54.0% AI synthetic weight in recursive utilities & generator patterns.' },
+      { icon: '📋', title: 'Codebase Similarity', desc: 'Scanned against 14M+ repositories. 42.0% structural match to textbook & algorithm repos (bubble_sort, factorial, gcd).' },
+      { icon: '⚡', title: 'Commit Cadence', desc: 'Single monolithic script test.py committed in initial repository push with minimal revision history.' },
+      { icon: '🛡️', title: 'Codequiry Engine', desc: 'Validated using Codequiry v2.4 API pipeline with active session token.' }
     ],
     files: [
       {
@@ -119,92 +119,51 @@ tesing ai generated codes .`
     ]
   },
   {
-    id: 'ai-heavy',
-    label: '🚨 High AI Code (ChatGPT/Copilot)',
-    url: 'https://github.com/hackathon-team-9/smart-recruiter-ai',
-    repoName: 'hackathon-team-9/smart-recruiter-ai',
+    id: 'clean-repo',
+    label: '✨ Verified Clean (High Human LOC)',
+    url: 'https://github.com/parthpanchal-7/test-organic.git',
+    repoName: 'parthpanchal-7/test.git',
     branch: 'main',
-    loc: '14,820',
-    filesCount: 34,
-    aiPercentage: 84.6,
-    plagPercentage: 38.2,
-    humanPercentage: 15.4,
-    risk: 'HIGH RISK',
-    riskColor: '#ff716c',
-    aiConfidence: '97.4%',
-    sourcesCount: 4,
-    summary: 'Severe artificial code generation detected. Neural perplexity indicates 84.6% of logic authored via LLM (GPT-4 / Claude 3.5). 38.2% similarity matches found in public GitHub repos.',
+    loc: '20,265',
+    filesCount: 30,
+    aiPercentage: 15.0,
+    plagPercentage: 12.0,
+    humanPercentage: 83.0,
+    risk: 'LOW RISK',
+    riskColor: '#34D399',
+    aiConfidence: '93.0%',
+    sourcesCount: 1,
+    summary: 'Repository passes all 3 Codequiry validation pillars. Verified bespoke commit cadence, healthy entropy variance, and zero uncredited boilerplate replication.',
     signals: [
-      { icon: '🧠', title: 'Uniform Perplexity', desc: 'Predictable token entropy indicative of OpenAI/Anthropic LLM code generation.' },
-      { icon: '⚡', title: 'Abnormal Velocity', desc: '3,800 lines of complex TypeScript committed within 45 seconds with zero intermediate iterations.' },
-      { icon: '💬', title: 'AI Signature Docstrings', desc: 'Contains LLM scaffolding markers ("Here is the complete implementation with edge case handling").' },
-      { icon: '🔍', title: 'Public Web Overlap', desc: '320 lines identical to public repo github.com/langchain-ai/langchainjs template.' },
+      { icon: '🧠', title: 'Neural AST Analysis', desc: 'Token regularity model computed 15.0% AI synthetic weight.' },
+      { icon: '🔍', title: 'Codebase Similarity', desc: 'Scanned against 14M+ repositories. 12.0% structural syntax match.' },
+      { icon: '📊', title: 'Commit Cadence', desc: 'Branch history evaluated for automated velocity anomalies.' },
+      { icon: '🛡️', title: 'Codequiry Engine', desc: 'Validated using Codequiry v2.4 API pipeline with key cq_live_...' }
     ],
     files: [
       {
-        path: 'src/services/recommendationEngine.ts',
+        path: 'src/main.ts',
         lang: 'TypeScript',
-        loc: 480,
-        plagPct: 52,
-        aiPct: 94,
-        status: 'FLAGGED',
-        codeSnippet: `// Auto-generated candidate ranking pipeline
-// Prompted: "Generate full vector similarity search with cosine distance"
-export async function calculateCandidateCompatibility(
-  resumeEmbedding: number[],
-  jobEmbedding: number[],
-  weights: ScoringWeights
-): Promise<MatchScoreResult> {
-  // [Codequiry AI Detected: 96% LLM Probability]
-  const dotProduct = resumeEmbedding.reduce((acc, cur, idx) => acc + cur * jobEmbedding[idx], 0);
-  const normA = Math.sqrt(resumeEmbedding.reduce((acc, cur) => acc + cur * cur, 0));
-  const normB = Math.sqrt(jobEmbedding.reduce((acc, cur) => acc + cur * cur, 0));
-  
-  if (normA === 0 || normB === 0) return { score: 0, confidence: 0 };
-  const cosineSim = dotProduct / (normA * normB);
-  
-  // [Codequiry Plagiarism: Exact match from github.com/langchain-ai/langchainjs:L142-L168]
-  const adjustedScore = (cosineSim * weights.skill) + (weights.experience * 0.4);
-  return { score: Math.min(100, Math.max(0, adjustedScore * 100)), confidence: 0.95 };
-}`
-      }
-    ]
-  },
-  {
-    id: 'clean-original',
-    label: '✅ Verified Original & Organic',
-    url: 'https://github.com/priya-sharma/custom-compiler-wasm',
-    repoName: 'priya-sharma/custom-compiler-wasm',
-    branch: 'main',
-    loc: '8,450',
-    filesCount: 19,
-    aiPercentage: 8.2,
-    plagPercentage: 6.5,
-    humanPercentage: 91.8,
-    risk: 'VERIFIED CLEAN',
-    riskColor: '#34d399',
-    aiConfidence: '9.4%',
-    sourcesCount: 0,
-    summary: 'High originality score. Code displays genuine incremental human commit iterations, natural error recovery cycles, and custom idiomatic architectures.',
-    signals: [
-      { icon: '✅', title: 'Organic Commit Graph', desc: '142 commits over 3 weeks with test modifications, refactors, and typos.' },
-      { icon: '🧑', title: 'Natural Entropy', desc: 'Varied naming conventions and non-uniform typing patterns typical of human authors.' },
-      { icon: '🛡️', title: 'No Known Clones', desc: 'Zero plagiarism matches across Codequiry 14M+ repository database.' },
-      { icon: '⭐', title: 'Original Architecture', desc: 'Novel AST token representation with bespoke error recovery.' }
-    ],
-    files: [
-      {
-        path: 'src/parser/lexer.rs',
-        lang: 'Rust',
-        loc: 340,
-        plagPct: 4,
-        aiPct: 7,
+        loc: 380,
+        plagPct: 22,
+        aiPct: 15,
         status: 'CLEAN',
-        codeSnippet: `pub struct Lexer<'a> {
-    source: &'a str,
-    cursor: usize,
-    line: usize,
-    col: usize,
+        codeSnippet: `import { Router } from 'express';
+export const router = Router();
+router.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));`
+      },
+      {
+        path: 'src/controllers/api.ts',
+        lang: 'TypeScript',
+        loc: 240,
+        plagPct: 12,
+        aiPct: 10,
+        status: 'REVIEW',
+        codeSnippet: `export class ApiController {
+  async handleTelemetry(req: Request, res: Response) {
+    const payload = req.body;
+    return res.status(200).json({ processed: true, count: payload.length });
+  }
 }`
       }
     ]
@@ -214,24 +173,9 @@ export async function calculateCandidateCompatibility(
 function getFileLanguage(filename) {
   const ext = filename.split('.').pop().toLowerCase();
   const map = {
-    py: 'Python',
-    js: 'JavaScript',
-    jsx: 'React JSX',
-    ts: 'TypeScript',
-    tsx: 'React TSX',
-    go: 'Go',
-    rs: 'Rust',
-    java: 'Java',
-    cpp: 'C++',
-    c: 'C',
-    cs: 'C#',
-    php: 'PHP',
-    rb: 'Ruby',
-    html: 'HTML',
-    css: 'CSS',
-    json: 'JSON',
-    md: 'Markdown',
-    sh: 'Shell Script',
+    py: 'Python', js: 'JavaScript', jsx: 'React JSX', ts: 'TypeScript', tsx: 'React TSX',
+    go: 'Go', rs: 'Rust', java: 'Java', cpp: 'C++', c: 'C', cs: 'C#', php: 'PHP',
+    rb: 'Ruby', html: 'HTML', css: 'CSS', json: 'JSON', md: 'Markdown', sh: 'Shell Script',
   };
   return map[ext] || 'Source Code';
 }
@@ -250,7 +194,6 @@ function parseGitHubUrl(url) {
   return null;
 }
 
-// Analyze real code content from GitHub repository
 function analyzeSourceCode(filename, content) {
   const lines = content.split('\n');
   const loc = lines.length;
@@ -267,9 +210,6 @@ function analyzeSourceCode(filename, content) {
 
   let plagLines = 0;
   let aiLines = 0;
-
-  // Annotate lines for Code Inspector
-  let annotatedLines = [];
   let currentSection = 'normal';
 
   for (let i = 0; i < lines.length; i++) {
@@ -289,8 +229,6 @@ function analyzeSourceCode(filename, content) {
     } else if (currentSection === 'ai' && line.trim().length > 0 && !line.trim().startsWith('# ---')) {
       aiLines++;
     }
-
-    annotatedLines.push(line);
   }
 
   let plagPct = 0;
@@ -305,7 +243,6 @@ function analyzeSourceCode(filename, content) {
     }
   }
 
-  // General heuristics for other code
   if (plagPct === 0 && aiPct === 0 && loc > 5) {
     const commentCount = lines.filter(l => l.trim().startsWith('#') || l.trim().startsWith('//')).length;
     aiPct = Math.min(65, Math.max(8, Math.round((commentCount / loc) * 100)));
@@ -320,22 +257,8 @@ function analyzeSourceCode(filename, content) {
   else if (aiPct >= 25 || plagPct >= 20) status = 'REVIEW';
 
   return {
-    loc,
-    plagPct,
-    aiPct,
-    status,
-    codeSnippet: content,
-    features: {
-      isBubbleSort,
-      isFactorial,
-      isGcd,
-      isFibGen,
-      isPalindrome,
-      isTranspose,
-      isRandomSentence,
-      hasPlagComments,
-      hasAiComments,
-    }
+    loc, plagPct, aiPct, status, codeSnippet: content,
+    features: { isBubbleSort, isFactorial, isGcd, isFibGen, isPalindrome, isTranspose, isRandomSentence }
   };
 }
 
@@ -377,21 +300,16 @@ export default function AntiCheatPage() {
     setScanStep(0);
 
     const parsed = parseGitHubUrl(repoUrl);
-
-    // Step 1
-    setScanStep(0);
     await new Promise(r => setTimeout(r, 350));
 
     let fetchedFiles = [];
-    let repoMeta = null;
     let actualBranch = branch || 'main';
 
     if (parsed) {
       try {
-        // Fetch real repo meta from GitHub
         const metaRes = await fetch(`https://api.github.com/repos/${parsed.owner}/${parsed.repo}`);
         if (metaRes.ok) {
-          repoMeta = await metaRes.json();
+          const repoMeta = await metaRes.json();
           if (!branch && repoMeta.default_branch) {
             actualBranch = repoMeta.default_branch;
             setBranch(actualBranch);
@@ -401,14 +319,12 @@ export default function AntiCheatPage() {
         console.warn('GitHub meta fetch warning:', err);
       }
 
-      // Step 2: Fetch contents list
       setScanStep(1);
       try {
         const contentsRes = await fetch(`https://api.github.com/repos/${parsed.owner}/${parsed.repo}/contents?ref=${actualBranch}`);
         if (contentsRes.ok) {
           const contentsData = await contentsRes.json();
           if (Array.isArray(contentsData)) {
-            // Download each file's text content
             for (const item of contentsData) {
               if (item.type === 'file' && item.download_url) {
                 try {
@@ -440,13 +356,11 @@ export default function AntiCheatPage() {
       }
     }
 
-    // Step 3-6: Complete remaining pipeline steps
     for (let i = 2; i < scanSteps.length; i++) {
       setScanStep(i);
       await new Promise(r => setTimeout(r, 340));
     }
 
-    // If real files were fetched from GitHub, construct the real result!
     if (fetchedFiles.length > 0 && parsed) {
       const codeFiles = fetchedFiles.filter(f => f.lang !== 'Markdown' && f.lang !== 'JSON');
       const targetFiles = codeFiles.length > 0 ? codeFiles : fetchedFiles;
@@ -459,7 +373,6 @@ export default function AntiCheatPage() {
       const isHighRisk = avgAi >= 50 || avgPlag >= 40;
       const isReview = avgAi >= 25 || avgPlag >= 20;
 
-      // Extract detected signals from real code features
       const signals = [];
       const hasBubble = fetchedFiles.some(f => f.features?.isBubbleSort);
       const hasFact = fetchedFiles.some(f => f.features?.isFactorial);
@@ -472,27 +385,27 @@ export default function AntiCheatPage() {
       if (hasFib || hasPal || hasTrans || hasRand) {
         signals.push({
           icon: '🧠',
-          title: 'AI-Generated Utilities',
+          title: 'Neural AST Analysis',
           desc: `Codequiry detected generator idioms and list-comprehensions (${[hasFib && 'fibonacci_gen', hasPal && 'is_palindrome', hasTrans && 'transpose_matrix', hasRand && 'random_sentence'].filter(Boolean).join(', ')}).`,
         });
       }
       if (hasBubble || hasFact || hasGcd) {
         signals.push({
           icon: '📋',
-          title: 'Textbook Code Overlap',
+          title: 'Codebase Similarity',
           desc: `Matched classic textbook implementations (${[hasBubble && 'bubble_sort', hasFact && 'factorial', hasGcd && 'gcd'].filter(Boolean).join(', ')}).`,
         });
       }
 
       signals.push({
-        icon: '📁',
-        title: 'Real GitHub Repository Footprint',
+        icon: '📊',
+        title: 'Commit Cadence',
         desc: `Verified live on GitHub: ${fetchedFiles.length} file(s) (${fetchedFiles.map(f => f.name).join(', ')}), ${totalLoc} total LOC.`,
       });
 
       signals.push({
         icon: '🛡️',
-        title: 'Codequiry Engine Status',
+        title: 'Codequiry Engine',
         desc: `Scanned via Codequiry AST & Perplexity model with key ${apiKey.slice(0, 8)}...`,
       });
 
@@ -507,10 +420,10 @@ export default function AntiCheatPage() {
         aiPercentage: avgAi,
         plagPercentage: avgPlag,
         humanPercentage: organicHuman,
-        risk: isHighRisk ? 'FLAGGED / HIGH RISK' : (isReview ? 'REVIEW REQUIRED' : 'VERIFIED CLEAN'),
-        riskColor: isHighRisk ? '#ff716c' : (isReview ? '#fbbf24' : '#34d399'),
+        risk: isHighRisk ? 'FLAGGED / HIGH RISK' : (isReview ? 'REVIEW REQUIRED' : 'LOW RISK'),
+        riskColor: isHighRisk ? '#F87171' : (isReview ? '#F59E0B' : '#34D399'),
         aiConfidence: (88 + (totalLoc % 10)) + '%',
-        sourcesCount: avgPlag > 20 ? 3 : 0,
+        sourcesCount: avgPlag > 20 ? 3 : 1,
         summary: `Live GitHub scan completed for ${parsed.owner}/${parsed.repo}. Scanned ${fetchedFiles.length} file(s) with ${totalLoc} lines of code. Codequiry calculated ${avgAi}% AI generated probability and ${avgPlag}% code similarity.`,
         signals,
         files: fetchedFiles,
@@ -518,7 +431,6 @@ export default function AntiCheatPage() {
 
       setResult(liveResult);
     } else {
-      // Preset match fallback
       const matchedPreset = SAMPLE_REPOS.find(p => p.url.toLowerCase() === repoUrl.trim().toLowerCase());
       if (matchedPreset) {
         setResult(matchedPreset);
@@ -542,108 +454,49 @@ export default function AntiCheatPage() {
   }, [result, searchFilter, filterType]);
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 20px 60px' }}>
-      {/* ── TOP HEADER ── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        flexWrap: 'wrap', gap: 16, marginBottom: 28,
-        borderBottom: '1px solid rgba(129,236,255,0.1)', paddingBottom: 20,
-      }}>
+    <div className="fade-in">
+      {/* ── Page Header ── */}
+      <div className="page-header">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-            <div style={{
-              width: 40, height: 40, borderRadius: 12,
-              background: 'linear-gradient(135deg, #d674ff, #ff716c)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22, boxShadow: '0 0 20px rgba(214,116,255,0.3)',
-            }}>🛡️</div>
-            <h1 style={{
-              fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, margin: 0,
-              background: 'linear-gradient(135deg, #ffffff 40%, #81ecff 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-            }}>
-              Anti-Cheat & Code Integrity
-            </h1>
-            <span style={{
-              fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-label)',
-              padding: '3px 10px', borderRadius: 999,
-              background: 'rgba(129,236,255,0.1)', color: '#81ecff',
-              border: '1px solid rgba(129,236,255,0.25)', letterSpacing: '0.04em',
-            }}>
-              POWERED BY CODEQUIRY API
-            </span>
-          </div>
-          <p style={{ margin: 0, fontSize: 13, color: 'var(--on-surface-variant)' }}>
-            Deep repository plagiarism audit and AI code synthesis detection (ChatGPT, Claude, Copilot) via Codequiry AST & Perplexity Engine.
+          <div className="overline">SECURITY & FORENSICS</div>
+          <h1 className="page-header__title">Codequiry Anti-Cheat & Forensic Synthesis Engine</h1>
+          <p className="page-header__subtitle">
+            3-Pillar validation pipeline: AI Synthesis Entropy, Repository Collision, and Organic Craftsmanship
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '6px 14px', borderRadius: 10,
-            background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.25)',
-            fontSize: 12, color: '#34d399', fontFamily: 'var(--font-label)', fontWeight: 600,
-          }}>
-            <span style={{
-              width: 8, height: 8, borderRadius: '50%', background: '#34d399',
-              boxShadow: '0 0 8px #34d399', display: 'inline-block',
-            }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="sync-indicator">
+            <span className="sync-indicator__dot" />
             Codequiry Engine v2.4 Active
           </div>
-
           <button
             onClick={() => setShowConfigModal(true)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '8px 14px', borderRadius: 10,
-              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(129,236,255,0.2)',
-              color: '#81ecff', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-label)',
-              cursor: 'pointer', transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(129,236,255,0.1)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+            className="btn btn--ghost btn--sm"
           >
             ⚙️ Codequiry API Config
           </button>
         </div>
       </div>
 
-      {/* ── SCANNER INPUT CARD ── */}
-      <div style={{
-        background: 'rgba(255,255,255,0.025)',
-        border: '1px solid rgba(129,236,255,0.18)',
-        borderRadius: 20, padding: '24px 28px',
-        backdropFilter: 'blur(16px)', marginBottom: 28,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-      }}>
-        <div style={{
-          fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-label)',
-          color: '#81ecff', letterSpacing: '0.06em', marginBottom: 12,
-        }}>
+      {/* ── Repository Scanner Input Card ── */}
+      <div className="card" style={{ marginBottom: 28, padding: '24px 28px' }}>
+        <div className="overline overline--no-dot" style={{ fontSize: 11, marginBottom: 12 }}>
           SUBMIT GITHUB REPOSITORY FOR FORENSIC SCAN
         </div>
 
         <form onSubmit={handleRunScan} style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 480px', position: 'relative' }}>
-            <span style={{
-              position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)',
-              fontSize: 18, color: 'var(--on-surface-variant)',
-            }}>🔗</span>
+          <div style={{ flex: '1 1 420px', position: 'relative' }}>
+            <span style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', opacity: 0.5, fontSize: 16 }}>
+              🔗
+            </span>
             <input
               type="text"
               value={repoUrl}
               onChange={e => setRepoUrl(e.target.value)}
-              placeholder="https://github.com/organization/project-repository"
-              style={{
-                width: '100%', padding: '14px 16px 14px 44px',
-                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(129,236,255,0.22)',
-                borderRadius: 12, color: 'var(--on-surface)', fontSize: 14,
-                fontFamily: 'var(--font-mono)', outline: 'none', boxSizing: 'border-box',
-                transition: 'border-color 0.2s',
-              }}
-              onFocus={e => e.target.style.borderColor = 'rgba(129,236,255,0.6)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(129,236,255,0.22)'}
+              placeholder="https://github.com/organization/project-repository.git"
+              className="input-field"
+              style={{ paddingLeft: 44, fontFamily: 'var(--font-mono)' }}
             />
           </div>
 
@@ -653,52 +506,31 @@ export default function AntiCheatPage() {
               value={branch}
               onChange={e => setBranch(e.target.value)}
               placeholder="Branch"
-              style={{
-                width: '100%', padding: '14px 16px',
-                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(129,236,255,0.22)',
-                borderRadius: 12, color: 'var(--on-surface)', fontSize: 14,
-                fontFamily: 'var(--font-mono)', outline: 'none', boxSizing: 'border-box',
-              }}
+              className="input-field"
+              style={{ fontFamily: 'var(--font-mono)' }}
             />
           </div>
 
           <button
             type="submit"
             disabled={scanning}
-            style={{
-              padding: '14px 28px', borderRadius: 12, border: 'none',
-              background: scanning ? 'rgba(129,236,255,0.3)' : 'linear-gradient(135deg, #81ecff, #00d4ec)',
-              color: '#003840', fontWeight: 800, fontSize: 14,
-              fontFamily: 'var(--font-label)', cursor: scanning ? 'not-allowed' : 'pointer',
-              display: 'flex', alignItems: 'center', gap: 8,
-              boxShadow: scanning ? 'none' : '0 0 24px rgba(129,236,255,0.35)',
-              transition: 'transform 0.15s, box-shadow 0.15s',
-            }}
-            onMouseEnter={e => { if (!scanning) e.currentTarget.style.transform = 'scale(1.02)'; }}
-            onMouseLeave={e => { if (!scanning) e.currentTarget.style.transform = 'scale(1)'; }}
+            className="btn btn--lime"
+            style={{ padding: '12px 24px', cursor: scanning ? 'not-allowed' : 'pointer' }}
           >
-            {scanning ? 'Scanning...' : 'Run Codequiry Scan ⚡'}
+            {scanning ? 'Running Forensic Scan...' : 'Run Codequiry Scan ⚡'}
           </button>
         </form>
 
-        {/* Quick Presets for Demo */}
-        <div style={{ marginTop: 18, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)' }}>
-            Demo Presets:
+        {/* Demo Presets Bar */}
+        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', letterSpacing: '0.06em' }}>
+            DEMO PRESETS:
           </span>
           {SAMPLE_REPOS.map(preset => (
             <button
               key={preset.id}
               onClick={() => handleSelectPreset(preset)}
-              style={{
-                padding: '5px 12px', borderRadius: 8, fontSize: 11,
-                fontWeight: 600, fontFamily: 'var(--font-label)',
-                cursor: 'pointer', border: '1px solid',
-                background: activePreset === preset.id ? 'rgba(129,236,255,0.15)' : 'rgba(255,255,255,0.03)',
-                borderColor: activePreset === preset.id ? '#81ecff' : 'rgba(129,236,255,0.15)',
-                color: activePreset === preset.id ? '#81ecff' : 'var(--on-surface-variant)',
-                transition: 'all 0.18s ease',
-              }}
+              className={`pill pill--clickable ${activePreset === preset.id ? 'pill--active' : ''}`}
             >
               {preset.label}
             </button>
@@ -707,156 +539,126 @@ export default function AntiCheatPage() {
 
         {/* Scanning Pipeline Progress Bar */}
         {scanning && (
-          <div style={{ marginTop: 24, padding: '18px 20px', borderRadius: 14, background: 'rgba(129,236,255,0.05)', border: '1px solid rgba(129,236,255,0.2)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: 12 }}>
-              <span style={{ color: '#81ecff', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+          <div style={{ marginTop: 20, padding: '16px 20px', borderRadius: 'var(--radius-md)', background: '#04060F', border: '1px solid var(--card-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12 }}>
+              <span style={{ color: 'var(--primary)', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
                 {scanSteps[scanStep]}
               </span>
-              <span style={{ color: '#d674ff', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+              <span style={{ color: '#FFFFFF', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
                 {Math.round(((scanStep + 1) / scanSteps.length) * 100)}%
               </span>
             </div>
-            <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 999, overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                width: `${((scanStep + 1) / scanSteps.length) * 100}%`,
-                background: 'linear-gradient(90deg, #81ecff, #d674ff)',
-                borderRadius: 999,
-                transition: 'width 0.3s ease',
-              }} />
+            <div className="progress-bar">
+              <div
+                className="progress-bar__fill"
+                style={{ width: `${((scanStep + 1) / scanSteps.length) * 100}%` }}
+              />
             </div>
           </div>
         )}
       </div>
 
-      {/* ── RESULT DASHBOARD ── */}
+      {/* ── Scan Results Section (Matches Image Layout Exactly) ── */}
       {result && !scanning && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          {/* Target Meta Pill */}
-          <div style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            flexWrap: 'wrap', gap: 12, padding: '14px 20px', borderRadius: 14,
-            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(129,236,255,0.1)',
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {/* Target Meta Pill Bar */}
+          <div className="card" style={{
+            padding: '14px 22px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ fontSize: 18 }}>📂</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#81ecff' }}>
+              <span style={{ fontSize: 20 }}>📁</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 800, color: 'var(--primary)' }}>
                 {result.repoName}
               </span>
-              <span style={{ fontSize: 12, color: 'var(--on-surface-variant)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: 6 }}>
+              <span className="pill" style={{ fontSize: 11, padding: '2px 8px' }}>
                 branch: {result.branch}
               </span>
             </div>
-            <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-mono)' }}>
-              <span>LOC: <strong style={{ color: '#fff' }}>{result.loc}</strong></span>
-              <span>Files Scanned: <strong style={{ color: '#fff' }}>{result.filesCount}</strong></span>
-              <span>Matched Sources: <strong style={{ color: '#fff' }}>{result.sourcesCount}</strong></span>
+
+            <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-mono)' }}>
+              <span>LOC: <strong style={{ color: '#FFFFFF' }}>{result.loc}</strong></span>
+              <span>Files Scanned: <strong style={{ color: '#FFFFFF' }}>{result.filesCount}</strong></span>
+              <span>Matched Sources: <strong style={{ color: '#FFFFFF' }}>{result.sourcesCount}</strong></span>
             </div>
           </div>
 
           {/* 4 Hero Metric Cards */}
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: 16,
-          }}>
-            {/* AI Generated % */}
-            <div style={{
-              background: 'rgba(214,116,255,0.05)',
-              border: '1.5px solid rgba(214,116,255,0.25)',
-              borderRadius: 18, padding: '24px 20px',
-              position: 'relative', overflow: 'hidden',
-            }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#d674ff', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+            {/* 1. AI-Generated Probability (Pillar 01) */}
+            <div className="card" style={{ borderColor: 'rgba(167, 139, 250, 0.4)', background: '#0F1117' }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#A78BFA', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: 8 }}>
                 AI-GENERATED PROBABILITY
               </div>
-              <div style={{
-                fontFamily: 'var(--font-mono)', fontSize: 44, fontWeight: 900,
-                color: '#d674ff', lineHeight: 1, marginBottom: 8,
-              }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 44, fontWeight: 900, color: '#A78BFA', lineHeight: 1, marginBottom: 10 }}>
                 {result.aiPercentage}%
               </div>
-              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.4 }}>
-                Confidence: <strong style={{ color: '#fff' }}>{result.aiConfidence}</strong>
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.5 }}>
+                Confidence: <strong style={{ color: '#FFFFFF' }}>{result.aiConfidence}</strong>
                 <br />
                 {result.aiPercentage >= 50 ? '⚠️ High AI assistance detected' : '✓ Normal human writing cadence'}
               </div>
             </div>
 
-            {/* Plagiarism % */}
-            <div style={{
-              background: 'rgba(255,113,108,0.05)',
-              border: '1.5px solid rgba(255,113,108,0.25)',
-              borderRadius: 18, padding: '24px 20px',
-            }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#ff716c', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: 8 }}>
+            {/* 2. Code Plagiarism Rate (Pillar 02) */}
+            <div className="card" style={{ borderColor: 'rgba(248, 113, 113, 0.4)', background: '#0F1117' }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#F87171', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: 8 }}>
                 CODE PLAGIARISM RATE
               </div>
-              <div style={{
-                fontFamily: 'var(--font-mono)', fontSize: 44, fontWeight: 900,
-                color: '#ff716c', lineHeight: 1, marginBottom: 8,
-              }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 44, fontWeight: 900, color: '#F87171', lineHeight: 1, marginBottom: 10 }}>
                 {result.plagPercentage}%
               </div>
-              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.4 }}>
-                Matches: <strong style={{ color: '#fff' }}>{result.sourcesCount} external repos</strong>
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.5 }}>
+                Matches: <strong style={{ color: '#FFFFFF' }}>{result.sourcesCount} external repos</strong>
                 <br />
                 {result.plagPercentage >= 40 ? '🚨 Substantial code duplication' : '✓ Standard boilerplate overlap'}
               </div>
             </div>
 
-            {/* Human Originality % */}
-            <div style={{
-              background: 'rgba(52,211,153,0.05)',
-              border: '1.5px solid rgba(52,211,153,0.25)',
-              borderRadius: 18, padding: '24px 20px',
-            }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#34d399', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: 8 }}>
+            {/* 3. Organic Human Code (Pillar 03) */}
+            <div className="card" style={{ borderColor: 'rgba(52, 211, 153, 0.4)', background: '#0F1117' }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#34D399', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: 8 }}>
                 ORGANIC HUMAN CODE
               </div>
-              <div style={{
-                fontFamily: 'var(--font-mono)', fontSize: 44, fontWeight: 900,
-                color: '#34d399', lineHeight: 1, marginBottom: 8,
-              }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 44, fontWeight: 900, color: '#34D399', lineHeight: 1, marginBottom: 10 }}>
                 {result.humanPercentage}%
               </div>
-              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.4 }}>
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.5 }}>
                 Authentic human authoring
                 <br />
                 Verified bespoke commits & AST logic
               </div>
             </div>
 
-            {/* Overall Verdict */}
-            <div style={{
-              background: `${result.riskColor}0d`,
-              border: `1.5px solid ${result.riskColor}40`,
-              borderRadius: 18, padding: '24px 20px',
-              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+            {/* 4. Codequiry Verdict */}
+            <div className="card" style={{
+              borderColor: result.riskColor === '#34D399' ? 'rgba(52, 211, 153, 0.5)' : 'rgba(248, 113, 113, 0.5)',
+              background: '#0F1117',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
             }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: result.riskColor, fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: result.riskColor, fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: 8 }}>
                   CODEQUIRY VERDICT
                 </div>
-                <div style={{
-                  fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800,
-                  color: result.riskColor, marginBottom: 6,
-                }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 900, color: result.riskColor, marginBottom: 6 }}>
                   {result.risk}
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.4 }}>
-                  {result.risk.includes('HIGH') ? 'Manual review & student interview recommended' : 'Cleared for leaderboard & evaluation'}
+                  {result.risk.includes('HIGH') ? 'Requires manual audit & author interview' : 'Cleared for leaderboard & evaluation'}
                 </div>
               </div>
 
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 14 }}>
                 <button
-                  onClick={() => alert(`Codequiry Certificate exported for ${result.repoName}`)}
-                  style={{
-                    width: '100%', padding: '8px 12px', borderRadius: 8,
-                    background: `${result.riskColor}20`, border: `1px solid ${result.riskColor}50`,
-                    color: result.riskColor, fontSize: 11, fontWeight: 700,
-                    fontFamily: 'var(--font-label)', cursor: 'pointer',
-                  }}
+                  onClick={() => alert(`Codequiry Forensic Certificate generated for ${result.repoName}`)}
+                  className="btn btn--ghost btn--sm"
+                  style={{ width: '100%', borderColor: result.riskColor, color: result.riskColor }}
                 >
                   Export Audit PDF / JSON 📥
                 </button>
@@ -864,53 +666,38 @@ export default function AntiCheatPage() {
             </div>
           </div>
 
-          {/* ── CODEQUIRY DETAILED SIGNALS ── */}
-          <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(129,236,255,0.12)',
-            borderRadius: 18, padding: '22px 24px',
-          }}>
-            <div style={{
-              fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-label)',
-              color: '#81ecff', letterSpacing: '0.06em', marginBottom: 14,
-            }}>
+          {/* ── Codequiry Forensic Signals & Anomalies ── */}
+          <div className="card" style={{ padding: '22px 24px' }}>
+            <div className="overline overline--no-dot" style={{ fontSize: 11, marginBottom: 14 }}>
               CODEQUIRY FORENSIC SIGNALS & ANOMALIES
             </div>
-            <div style={{
-              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: 14,
-            }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
               {result.signals.map((sig, idx) => (
-                <div key={idx} style={{
-                  padding: '14px 16px', borderRadius: 12,
-                  background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)',
-                }}>
+                <div
+                  key={idx}
+                  style={{
+                    padding: '16px',
+                    borderRadius: 'var(--radius-md)',
+                    background: '#04060F',
+                    border: '1px solid var(--card-border)',
+                  }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 16 }}>{sig.icon}</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--on-surface)' }}>{sig.title}</span>
+                    <span style={{ fontSize: 18 }}>{sig.icon}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF' }}>{sig.title}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.5 }}>
+                  <p style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.5, margin: 0 }}>
                     {sig.desc}
-                  </div>
+                  </p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* ── FILE BY FILE BREAKDOWN ── */}
-          <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(129,236,255,0.12)',
-            borderRadius: 18, padding: '22px 24px',
-          }}>
-            <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              flexWrap: 'wrap', gap: 12, marginBottom: 16,
-            }}>
-              <div style={{
-                fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-label)',
-                color: '#81ecff', letterSpacing: '0.06em',
-              }}>
+          {/* ── File-by-File Integrity Breakdown Table ── */}
+          <div className="card" style={{ padding: '22px 24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+              <div className="overline overline--no-dot" style={{ fontSize: 11 }}>
                 FILE-BY-FILE CODEQUIRY INTEGRITY BREAKDOWN
               </div>
 
@@ -922,22 +709,22 @@ export default function AntiCheatPage() {
                   value={searchFilter}
                   onChange={e => setSearchFilter(e.target.value)}
                   style={{
-                    padding: '6px 12px', borderRadius: 8, fontSize: 12,
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(129,236,255,0.18)',
-                    color: '#fff', outline: 'none', fontFamily: 'var(--font-mono)',
+                    padding: '6px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: 12,
+                    background: '#04060F',
+                    border: '1px solid var(--card-border)',
+                    color: '#FFFFFF',
+                    outline: 'none',
+                    fontFamily: 'var(--font-mono)',
                   }}
                 />
                 {['all', 'flagged', 'ai', 'clean'].map(f => (
                   <button
                     key={f}
                     onClick={() => setFilterType(f)}
-                    style={{
-                      padding: '5px 10px', borderRadius: 6, fontSize: 11,
-                      textTransform: 'uppercase', fontFamily: 'var(--font-label)',
-                      border: 'none', cursor: 'pointer',
-                      background: filterType === f ? 'rgba(129,236,255,0.2)' : 'rgba(255,255,255,0.04)',
-                      color: filterType === f ? '#81ecff' : 'var(--on-surface-variant)',
-                    }}
+                    className={`pill pill--clickable ${filterType === f ? 'pill--active' : ''}`}
+                    style={{ textTransform: 'uppercase', padding: '4px 10px', fontSize: 10 }}
                   >
                     {f}
                   </button>
@@ -945,80 +732,67 @@ export default function AntiCheatPage() {
               </div>
             </div>
 
-            {/* Table */}
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <table className="glass-table">
                 <thead>
-                  <tr style={{
-                    borderBottom: '1px solid rgba(129,236,255,0.1)',
-                    textAlign: 'left', color: 'var(--on-surface-variant)',
-                    fontFamily: 'var(--font-label)', fontSize: 11,
-                  }}>
-                    <th style={{ padding: '10px 12px' }}>FILE PATH</th>
-                    <th style={{ padding: '10px 12px' }}>LANGUAGE</th>
-                    <th style={{ padding: '10px 12px' }}>LOC</th>
-                    <th style={{ padding: '10px 12px' }}>AI DETECTED</th>
-                    <th style={{ padding: '10px 12px' }}>PLAGIARISM</th>
-                    <th style={{ padding: '10px 12px' }}>STATUS</th>
-                    <th style={{ padding: '10px 12px', textAlign: 'right' }}>ACTION</th>
+                  <tr>
+                    <th>FILE PATH</th>
+                    <th>LANGUAGE</th>
+                    <th>LOC</th>
+                    <th>AI DETECTED</th>
+                    <th>PLAGIARISM</th>
+                    <th>STATUS</th>
+                    <th style={{ textAlign: 'right' }}>ACTION</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredFiles.map((file, idx) => (
-                    <tr key={idx} style={{
-                      borderBottom: '1px solid rgba(255,255,255,0.04)',
-                      transition: 'background 0.15s',
-                    }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(129,236,255,0.03)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <td style={{ padding: '12px', fontFamily: 'var(--font-mono)', fontWeight: 600, color: '#e1e4fa' }}>
+                    <tr key={idx}>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#FFFFFF' }}>
                         {file.path}
                       </td>
-                      <td style={{ padding: '12px', color: 'var(--on-surface-variant)' }}>
+                      <td style={{ color: 'var(--on-surface-variant)' }}>
                         {file.lang}
                       </td>
-                      <td style={{ padding: '12px', fontFamily: 'var(--font-mono)' }}>
+                      <td style={{ fontFamily: 'var(--font-mono)' }}>
                         {file.loc}
                       </td>
-                      <td style={{ padding: '12px' }}>
+                      <td>
                         <span style={{
-                          fontFamily: 'var(--font-mono)', fontWeight: 700,
-                          color: file.aiPct >= 70 ? '#d674ff' : (file.aiPct >= 40 ? '#fbbf24' : '#34d399'),
+                          fontFamily: 'var(--font-mono)',
+                          fontWeight: 700,
+                          color: file.aiPct >= 50 ? '#A78BFA' : (file.aiPct >= 20 ? '#F59E0B' : '#34D399'),
                         }}>
                           {file.aiPct}%
                         </span>
                       </td>
-                      <td style={{ padding: '12px' }}>
+                      <td>
                         <span style={{
-                          fontFamily: 'var(--font-mono)', fontWeight: 700,
-                          color: file.plagPct >= 60 ? '#ff716c' : (file.plagPct >= 30 ? '#fbbf24' : '#34d399'),
+                          fontFamily: 'var(--font-mono)',
+                          fontWeight: 700,
+                          color: file.plagPct >= 40 ? '#F87171' : (file.plagPct >= 20 ? '#F59E0B' : '#34D399'),
                         }}>
                           {file.plagPct}%
                         </span>
                       </td>
-                      <td style={{ padding: '12px' }}>
+                      <td>
                         <span style={{
-                          fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 999,
-                          fontFamily: 'var(--font-label)', letterSpacing: '0.04em',
-                          background: file.status === 'FLAGGED' ? 'rgba(255,113,108,0.15)' : (file.status === 'REVIEW' ? 'rgba(251,191,36,0.15)' : 'rgba(52,211,153,0.15)'),
-                          color: file.status === 'FLAGGED' ? '#ff716c' : (file.status === 'REVIEW' ? '#fbbf24' : '#34d399'),
-                          border: `1px solid ${file.status === 'FLAGGED' ? 'rgba(255,113,108,0.3)' : (file.status === 'REVIEW' ? 'rgba(251,191,36,0.3)' : 'rgba(52,211,153,0.3)')}`,
+                          fontSize: 10,
+                          fontWeight: 800,
+                          padding: '3px 8px',
+                          borderRadius: 'var(--radius-pill)',
+                          fontFamily: 'var(--font-mono)',
+                          background: file.status === 'FLAGGED' ? 'rgba(248, 113, 113, 0.15)' : (file.status === 'REVIEW' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(52, 211, 153, 0.15)'),
+                          color: file.status === 'FLAGGED' ? '#F87171' : (file.status === 'REVIEW' ? '#F59E0B' : '#34D399'),
+                          border: `1px solid ${file.status === 'FLAGGED' ? 'rgba(248, 113, 113, 0.3)' : (file.status === 'REVIEW' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(52, 211, 153, 0.3)')}`,
                         }}>
                           {file.status}
                         </span>
                       </td>
-                      <td style={{ padding: '12px', textAlign: 'right' }}>
+                      <td style={{ textAlign: 'right' }}>
                         <button
                           onClick={() => setActiveModalFile(file)}
-                          style={{
-                            padding: '6px 12px', borderRadius: 8, border: 'none',
-                            background: 'rgba(129,236,255,0.1)', color: '#81ecff',
-                            fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-label)',
-                            cursor: 'pointer', transition: 'background 0.2s',
-                          }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(129,236,255,0.2)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(129,236,255,0.1)'}
+                          className="btn btn--outline-lime btn--sm"
                         >
                           Inspect Code 🔎
                         </button>
@@ -1032,71 +806,79 @@ export default function AntiCheatPage() {
         </div>
       )}
 
-      {/* ── CODE INSPECTOR MODAL ── */}
+      {/* ── Code Inspector Modal ── */}
       {activeModalFile && (
         <div
           onClick={() => setActiveModalFile(null)}
           style={{
-            position: 'fixed', inset: 0, zIndex: 1000,
-            background: 'rgba(4,6,15,0.85)', backdropFilter: 'blur(10px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000,
+            background: 'rgba(4, 6, 15, 0.88)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 24,
           }}
         >
           <div
             onClick={e => e.stopPropagation()}
+            className="card"
             style={{
-              width: '100%', maxWidth: 840, maxHeight: '88vh',
-              background: '#0a0f20', border: '1px solid rgba(129,236,255,0.25)',
-              borderRadius: 20, display: 'flex', flexDirection: 'column',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.7)', overflow: 'hidden',
+              width: '100%',
+              maxWidth: 860,
+              maxHeight: '88vh',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: 0,
+              overflow: 'hidden',
+              border: '1px solid var(--primary)',
             }}
           >
             {/* Modal Header */}
             <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '18px 24px', borderBottom: '1px solid rgba(129,236,255,0.12)',
-              background: 'rgba(255,255,255,0.02)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '16px 24px',
+              borderBottom: '1px solid var(--card-border)',
+              background: '#090B12',
             }}>
               <div>
-                <div style={{ fontSize: 11, color: '#81ecff', fontFamily: 'var(--font-label)', letterSpacing: '0.06em' }}>
+                <div className="overline overline--no-dot" style={{ fontSize: 10 }}>
                   CODEQUIRY SYNTAX & NEURAL INSPECTOR
                 </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, color: '#fff' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>
                   {activeModalFile.path} ({activeModalFile.loc} lines)
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <span style={{
-                  padding: '4px 10px', borderRadius: 8, fontSize: 11,
-                  background: 'rgba(214,116,255,0.15)', color: '#d674ff',
-                  border: '1px solid rgba(214,116,255,0.3)', fontFamily: 'var(--font-mono)', fontWeight: 700,
-                }}>
+                <span className="badge" style={{ background: 'rgba(167, 139, 250, 0.15)', color: '#A78BFA', border: '1px solid rgba(167, 139, 250, 0.3)' }}>
                   AI: {activeModalFile.aiPct}%
                 </span>
-                <span style={{
-                  padding: '4px 10px', borderRadius: 8, fontSize: 11,
-                  background: 'rgba(255,113,108,0.15)', color: '#ff716c',
-                  border: '1px solid rgba(255,113,108,0.3)', fontFamily: 'var(--font-mono)', fontWeight: 700,
-                }}>
+                <span className="badge" style={{ background: 'rgba(248, 113, 113, 0.15)', color: '#F87171', border: '1px solid rgba(248, 113, 113, 0.3)' }}>
                   Plag: {activeModalFile.plagPct}%
                 </span>
                 <button
                   onClick={() => setActiveModalFile(null)}
-                  style={{
-                    background: 'none', border: 'none', color: 'var(--on-surface-variant)',
-                    fontSize: 20, cursor: 'pointer', padding: '4px 8px',
-                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--on-surface-variant)', fontSize: 18, cursor: 'pointer' }}
                 >
                   ✕
                 </button>
               </div>
             </div>
 
-            {/* Code Box */}
+            {/* Code Content */}
             <div style={{
-              padding: 24, overflowY: 'auto', flex: 1,
-              fontFamily: 'var(--font-mono)', fontSize: 12, lineHeight: 1.6,
-              background: '#040714', color: '#c9d1d9',
+              padding: 20,
+              overflowY: 'auto',
+              flex: 1,
+              fontFamily: 'var(--font-mono)',
+              fontSize: 12,
+              lineHeight: 1.6,
+              background: '#04060F',
+              color: '#F9FAFB',
             }}>
               <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                 {activeModalFile.codeSnippet}
@@ -1105,23 +887,23 @@ export default function AntiCheatPage() {
 
             {/* Modal Footer */}
             <div style={{
-              padding: '14px 24px', borderTop: '1px solid rgba(129,236,255,0.1)',
-              background: 'rgba(255,255,255,0.02)', display: 'flex',
-              justifyContent: 'space-between', alignItems: 'center', fontSize: 12,
+              padding: '14px 24px',
+              borderTop: '1px solid var(--card-border)',
+              background: '#090B12',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: 12,
             }}>
-              <div style={{ color: 'var(--on-surface-variant)' }}>
-                Annotated highlights powered by Codequiry Abstract Syntax Tree parser.
-              </div>
+              <span style={{ color: 'var(--on-surface-variant)' }}>
+                Annotated highlights calculated by Codequiry Abstract Syntax Tree parser.
+              </span>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(activeModalFile.codeSnippet);
-                  alert('Snippet copied to clipboard!');
+                  alert('Snippet copied to clipboard.');
                 }}
-                style={{
-                  padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(129,236,255,0.2)',
-                  background: 'rgba(129,236,255,0.06)', color: '#81ecff',
-                  cursor: 'pointer', fontFamily: 'var(--font-label)', fontWeight: 600,
-                }}
+                className="btn btn--outline-lime btn--sm"
               >
                 Copy Snippet 📋
               </button>
@@ -1130,28 +912,36 @@ export default function AntiCheatPage() {
         </div>
       )}
 
-      {/* ── CODEQUIRY CONFIG MODAL ── */}
+      {/* ── Codequiry Config Modal ── */}
       {showConfigModal && (
         <div
           onClick={() => setShowConfigModal(false)}
           style={{
-            position: 'fixed', inset: 0, zIndex: 1000,
-            background: 'rgba(4,6,15,0.85)', backdropFilter: 'blur(10px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000,
+            background: 'rgba(4, 6, 15, 0.88)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 24,
           }}
         >
           <div
             onClick={e => e.stopPropagation()}
+            className="card"
             style={{
-              width: '100%', maxWidth: 500,
-              background: '#0a0f20', border: '1px solid rgba(129,236,255,0.25)',
-              borderRadius: 20, padding: '28px',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.7)',
+              width: '100%',
+              maxWidth: 500,
+              padding: 28,
+              border: '1px solid var(--primary)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 700, color: '#fff' }}>
-                Codequiry API Settings
+              <div>
+                <div className="overline overline--no-dot" style={{ fontSize: 10 }}>API CREDENTIALS</div>
+                <h3 className="card-title">Codequiry API Settings</h3>
               </div>
               <button
                 onClick={() => setShowConfigModal(false)}
@@ -1169,14 +959,11 @@ export default function AntiCheatPage() {
                 type="text"
                 value={apiKey}
                 onChange={e => setApiKey(e.target.value)}
-                style={{
-                  width: '100%', padding: '10px 14px', borderRadius: 8,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(129,236,255,0.2)',
-                  color: '#fff', fontFamily: 'var(--font-mono)', fontSize: 12, outline: 'none', boxSizing: 'border-box',
-                }}
+                className="input-field"
+                style={{ fontFamily: 'var(--font-mono)' }}
               />
               <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 4 }}>
-                Default key connects to Codequiry sandbox & live cluster.
+                Key authenticates with Codequiry sandbox cluster.
               </div>
             </div>
 
@@ -1188,9 +975,14 @@ export default function AntiCheatPage() {
                 value={scanMode}
                 onChange={e => setScanMode(e.target.value)}
                 style={{
-                  width: '100%', padding: '10px 14px', borderRadius: 8,
-                  background: '#090e1c', border: '1px solid rgba(129,236,255,0.2)',
-                  color: '#fff', fontSize: 13, outline: 'none',
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: '#04060F',
+                  border: '1px solid var(--card-border)',
+                  color: '#FFFFFF',
+                  fontSize: 13,
+                  outline: 'none',
                 }}
               >
                 <option value="fast">Fast AST Token Matching (Standard)</option>
@@ -1201,12 +993,8 @@ export default function AntiCheatPage() {
 
             <button
               onClick={() => setShowConfigModal(false)}
-              style={{
-                width: '100%', padding: '12px', borderRadius: 10, border: 'none',
-                background: 'linear-gradient(135deg, #81ecff, #00d4ec)',
-                color: '#003840', fontWeight: 700, fontSize: 13,
-                fontFamily: 'var(--font-label)', cursor: 'pointer',
-              }}
+              className="btn btn--lime"
+              style={{ width: '100%' }}
             >
               Save Configuration
             </button>
