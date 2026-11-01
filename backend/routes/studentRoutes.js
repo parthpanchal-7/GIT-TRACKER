@@ -30,7 +30,7 @@ router.get('/profile', authMiddleware, async (req, res) => {
 // ─── PATCH /api/student/profile — Update profile ───
 router.patch('/profile', authMiddleware, async (req, res) => {
   try {
-    const { name, branch, semester, mobile, enrollmentId } = req.body;
+    const { name, branch, semester, mobile, enrollmentId, bio, college, linkedin, dob, avatar } = req.body;
     const updates = {};
     if (name) updates.name = name;
     if (branch) updates.branch = branch;
@@ -39,6 +39,11 @@ router.patch('/profile', authMiddleware, async (req, res) => {
       updates.year = Math.ceil(updates.semester / 2);
     }
     if (mobile !== undefined) updates.mobile = mobile;
+    if (bio !== undefined) updates.bio = bio;
+    if (college !== undefined) updates.college = college;
+    if (linkedin !== undefined) updates.linkedin = linkedin;
+    if (dob !== undefined) updates.dob = dob;
+    if (avatar !== undefined) updates.avatar = avatar;
     
     if (enrollmentId) {
       // Check if it already exists in another student

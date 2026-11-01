@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CosmicBackground } from './components/ui';
 import Sidebar from './components/Sidebar';
 import LoginPage from './pages/LoginPage';
+import GoogleOAuthCallbackPage from './pages/GoogleOAuthCallbackPage';
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import LeaderboardPage from './pages/LeaderboardPage';
@@ -65,13 +66,13 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Landing page — always public at /Home */}
+          {/* Landing page — public at /Home, /home, and / */}
           <Route path="/Home" element={<LandingPage />} />
           <Route path="/home" element={<Navigate to="/Home" replace />} />
           <Route path="/" element={<Navigate to="/Home" replace />} />
 
-          {/* Landing page — always public */}
-          <Route path="/" element={<LandingPage />} />
+          {/* Google OAuth callback */}
+          <Route path="/login/google/callback" element={<GoogleOAuthCallbackPage />} />
 
           {/* Public routes */}
           <Route element={<PublicRoute />}>
