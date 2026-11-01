@@ -21,9 +21,11 @@ const studentSchema = new mongoose.Schema(
     },
     branch: {
       type: String,
-      required: true,
-      enum: ['CSE', 'IT', 'ECE', 'ME', 'CV', 'MAC', 'AIDS', 'AIML', 'IOT'],
+      default: 'General',
     },
+    college: String,
+    linkedin: String,
+    dob: String,
     semester: {
       type: Number,
       min: 1,

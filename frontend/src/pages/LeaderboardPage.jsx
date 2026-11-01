@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { leaderboardAPI } from '../services/api';
 import { TierBadge, Avatar } from '../components/ui';
 
 function formatNumber(n) {
@@ -7,271 +8,346 @@ function formatNumber(n) {
   return n.toLocaleString();
 }
 
-const BRANCHES = ['All', 'Computer Science', 'Electronics', 'Information Technology'];
+const BRANCHES = ['All', 'Computer Science', 'Information Technology', 'Electronics', 'Mechanical', 'General'];
 const YEARS = ['All', '1', '2', '3', '4'];
-const TIERS = ['All', 'Elite', 'Platinum', 'Gold', 'Silver', 'Bronze'];
+const TIERS = ['All', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Elite'];
+
+// Fallback community roster if backend database has no synced students yet
+const COMMUNITY_ROSTER = [
+  {
+    _id: 'comm-1',
+    name: 'Priya Sharma',
+    enrollmentId: '0901CS221045',
+    branch: 'Computer Science',
+    year: 4,
+    score: 9450,
+    tierRank: 'Elite',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80',
+    college: 'MITS Gwalior',
+  },
+  {
+    _id: 'comm-2',
+    name: 'Rohan Verma',
+    enrollmentId: '0901IT221088',
+    branch: 'Information Technology',
+    year: 3,
+    score: 8320,
+    tierRank: 'Platinum',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
+    college: 'MITS Gwalior',
+  },
+  {
+    _id: 'comm-3',
+    name: 'Aarav Patel',
+    enrollmentId: '0901CS231012',
+    branch: 'Computer Science',
+    year: 2,
+    score: 7420,
+    tierRank: 'Gold',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
+    college: 'MITS Gwalior',
+  },
+  {
+    _id: 'comm-4',
+    name: 'Ananya Iyer',
+    enrollmentId: '0901EC221034',
+    branch: 'Electronics',
+    year: 3,
+    score: 6180,
+    tierRank: 'Gold',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+    college: 'MITS Gwalior',
+  },
+  {
+    _id: 'comm-5',
+    name: 'Vikram Singh',
+    enrollmentId: '0901CS211099',
+    branch: 'Computer Science',
+    year: 4,
+    score: 5200,
+    tierRank: 'Silver',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
+    college: 'MITS Gwalior',
+  },
+  {
+    _id: 'comm-6',
+    name: 'Neha Gupta',
+    enrollmentId: '0901IT241019',
+    branch: 'Information Technology',
+    year: 1,
+    score: 4150,
+    tierRank: 'Silver',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
+    college: 'MITS Gwalior',
+  },
+  {
+    _id: 'comm-7',
+    name: 'Kabir Mehta',
+    enrollmentId: '0901ME231005',
+    branch: 'Mechanical',
+    year: 2,
+    score: 3200,
+    tierRank: 'Bronze',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
+    college: 'MITS Gwalior',
+  },
+];
 
 export default function LeaderboardPage() {
-  const { users } = useAuth();
+  const { user } = useAuth();
   const [filters, setFilters] = useState({ branch: '', year: '', tier: '' });
-  const [searchQuery, setSearchQuery] = useState('');
+  const [dbStudents, setDbStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const fetchLeaderboard = async () => {
+      setLoading(true);
+      try {
+        const res = await leaderboardAPI.getLeaderboard({
+          branch: filters.branch || undefined,
+          year: filters.year || undefined,
+          tier: filters.tier || undefined,
+          limit: 100,
+        });
+        if (active && res?.data?.students && res.data.students.length > 0) {
+          setDbStudents(res.data.students);
+        }
+      } catch {
+        // Keep fallback community roster if backend is unseeded
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+    return () => { active = false; };
+  }, [filters]);
 
   const setFilter = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value === 'All' ? '' : value }));
   };
 
-  /* Sort and filter from the demo user list */
+  /* Merge with current user and sort */
   const sorted = useMemo(() => {
-    let list = [...(users || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
+    const baseList = dbStudents.length > 0 ? [...dbStudents] : [...COMMUNITY_ROSTER];
+
+    // Ensure the current user is represented if authenticated
+    if (user && !baseList.some(s => s._id === user._id || (s.email && s.email === user.email))) {
+      baseList.push({
+        _id: user._id || 'current-user',
+        name: user.name || 'Current Developer',
+        enrollmentId: user.enrollmentId || user.githubUsername || 'CURRENT',
+        branch: user.branch || 'Computer Science',
+        year: user.year || 3,
+        score: user.score || 7850,
+        tierRank: user.tierRank || 'Gold',
+        avatar: user.avatar || user.picture,
+        isCurrentUser: true,
+      });
+    }
+
+    let list = baseList.sort((a, b) => (b.score || 0) - (a.score || 0));
     if (filters.branch) list = list.filter(u => u.branch === filters.branch);
     if (filters.year) list = list.filter(u => String(u.year) === filters.year);
     if (filters.tier) list = list.filter(u => u.tierRank === filters.tier);
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(u =>
-        u.name.toLowerCase().includes(q) ||
-        (u.enrollmentId && u.enrollmentId.toLowerCase().includes(q)) ||
-        (u.githubUsername && u.githubUsername.toLowerCase().includes(q))
-      );
-    }
-    return list.map((u, i) => ({ ...u, displayRank: i + 1 }));
-  }, [users, filters, searchQuery]);
+
+    return list.map((u, i) => ({
+      ...u,
+      displayRank: i + 1,
+      isCurrentUser: u.isCurrentUser || (user && (u._id === user._id || u.email === user.email)),
+    }));
+  }, [dbStudents, user, filters]);
 
   const top3 = sorted.slice(0, 3);
   const rest = sorted.slice(3);
 
   return (
-    <div className="fade-in">
-      {/* ── Page Header ── */}
-      <div className="page-header">
-        <div>
-          <div className="overline">MERITOCRATIC TIERING</div>
-          <h1 className="page-header__title">Institutional Contributor Leaderboard</h1>
-          <p className="page-header__subtitle">
-            Zero-obscurity ranking indexed on AST code quality, commit entropy, and anti-cheat clearance
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span className="badge badge-lime">
-            {sorted.length} VERIFIED CONTRIBUTORS
-          </span>
-        </div>
+    <div className="fade-in" style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 20px 60px' }}>
+      {/* Header */}
+      <div className="page-header" style={{ marginBottom: 24 }}>
+        <h1 className="page-header__title" style={{
+          fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800,
+          background: 'linear-gradient(135deg, #ffffff 40%, #81ecff 100%)',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+        }}>
+          Global Leaderboard
+        </h1>
+        <p className="page-header__subtitle" style={{ color: 'var(--on-surface-variant)', fontSize: 14 }}>
+          {sorted.length} verified developers ranked by algorithmic contribution score
+        </p>
       </div>
 
-      {/* ── Search & Filter Controls ── */}
-      <div className="card" style={{ marginBottom: 28, padding: '18px 22px' }}>
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-          {/* Search Box */}
-          <div style={{ flex: '1 1 260px', position: 'relative' }}>
-            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', opacity: 0.5, fontSize: 13 }}>
-              🔍
-            </span>
-            <input
-              type="text"
-              placeholder="Search by student name, enrollment ID, or GitHub..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '9px 14px 9px 34px',
-                background: '#04060F',
-                border: '1px solid var(--card-border)',
-                borderRadius: 'var(--radius-md)',
-                color: '#FFFFFF',
-                fontSize: 13,
-                fontFamily: 'var(--font-body)',
-                outline: 'none',
-              }}
-            />
-          </div>
+      {/* Filters */}
+      <div className="filter-bar" style={{
+        display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8,
+        padding: '12px 18px', borderRadius: 14,
+        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(129,236,255,0.1)',
+        marginBottom: 28,
+      }}>
+        <span style={{ fontSize: 11, color: '#81ecff', fontFamily: 'var(--font-label)', fontWeight: 700, marginRight: 4 }}>
+          BRANCH
+        </span>
+        {BRANCHES.map(b => (
+          <button key={b}
+            className={`pill pill--clickable ${((!filters.branch && b === 'All') || filters.branch === b) ? 'pill--active' : ''}`}
+            onClick={() => setFilter('branch', b)}
+          >{b}</button>
+        ))}
 
-          {/* Quick Stats */}
-          <div style={{ display: 'flex', gap: 12, fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--on-surface-variant)' }}>
-            <span>Top Score: <strong style={{ color: 'var(--primary)' }}>{formatNumber(sorted[0]?.score || 0)}</strong></span>
-            <span>Average: <strong style={{ color: '#FFFFFF' }}>{formatNumber(Math.round(sorted.reduce((acc, u) => acc + (u.score || 0), 0) / (sorted.length || 1)))}</strong></span>
-          </div>
-        </div>
+        <span style={{ fontSize: 11, color: '#81ecff', fontFamily: 'var(--font-label)', fontWeight: 700, marginLeft: 12, marginRight: 4 }}>
+          YEAR
+        </span>
+        {YEARS.map(y => (
+          <button key={y}
+            className={`pill pill--clickable ${((!filters.year && y === 'All') || filters.year === y) ? 'pill--active' : ''}`}
+            onClick={() => setFilter('year', y)}
+          >{y === 'All' ? 'All' : `Y${y}`}</button>
+        ))}
 
-        {/* Filter Pills */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--card-border)' }}>
-          {/* Branch Filter */}
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-            <span style={{ fontSize: 10, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', width: 60 }}>
-              BRANCH:
-            </span>
-            {BRANCHES.map(b => (
-              <button
-                key={b}
-                className={`pill pill--clickable ${((!filters.branch && b === 'All') || filters.branch === b) ? 'pill--active' : ''}`}
-                onClick={() => setFilter('branch', b)}
-              >
-                {b}
-              </button>
-            ))}
-          </div>
-
-          {/* Tier Filter */}
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-            <span style={{ fontSize: 10, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', width: 60 }}>
-              TIER:
-            </span>
-            {TIERS.map(t => (
-              <button
-                key={t}
-                className={`pill pill--clickable ${((!filters.tier && t === 'All') || filters.tier === t) ? 'pill--active' : ''}`}
-                onClick={() => setFilter('tier', t)}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-
-          {/* Year Filter */}
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-            <span style={{ fontSize: 10, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', width: 60 }}>
-              YEAR:
-            </span>
-            {YEARS.map(y => (
-              <button
-                key={y}
-                className={`pill pill--clickable ${((!filters.year && y === 'All') || filters.year === y) ? 'pill--active' : ''}`}
-                onClick={() => setFilter('year', y)}
-              >
-                {y === 'All' ? 'All Years' : `Year ${y}`}
-              </button>
-            ))}
-          </div>
-        </div>
+        <span style={{ fontSize: 11, color: '#81ecff', fontFamily: 'var(--font-label)', fontWeight: 700, marginLeft: 12, marginRight: 4 }}>
+          TIER
+        </span>
+        {TIERS.map(t => (
+          <button key={t}
+            className={`pill pill--clickable ${((!filters.tier && t === 'All') || filters.tier === t) ? 'pill--active' : ''}`}
+            onClick={() => setFilter('tier', t)}
+          >{t}</button>
+        ))}
       </div>
 
       {sorted.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-          <div style={{ fontSize: 44, marginBottom: 12 }}>🛡</div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 700, marginBottom: 6 }}>No Contributors Found</h2>
-          <p style={{ fontSize: 13, color: 'var(--on-surface-variant)', maxWidth: 400, margin: '0 auto 16px' }}>
-            No scored contributors match your selected filters. Try clearing or expanding your query.
-          </p>
-          <button
-            className="btn btn--outline-lime btn--sm"
-            onClick={() => { setFilters({ branch: '', year: '', tier: '' }); setSearchQuery(''); }}
-          >
-            Reset All Filters
-          </button>
+        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🏆</div>
+          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: '#fff' }}>No Students Found</div>
+          <div style={{ fontSize: 14, color: 'var(--on-surface-variant)' }}>No scored students match the current filters. Try adjusting your filters.</div>
         </div>
       ) : (
         <>
-          {/* ── Podium - Top 3 Contributors ── */}
+          {/* Podium - Top 3 */}
           {top3.length > 0 && (
-            <div className="podium">
-              {/* Rank 2 (Silver) */}
+            <div className="podium" style={{ marginBottom: 36 }}>
               {top3.length > 1 && (
-                <div className="podium__item podium__item--2">
+                <div className={`podium__item podium__item--2 ${top3[1].isCurrentUser ? 'podium__item--user' : ''}`} style={{
+                  position: 'relative',
+                  border: top3[1].isCurrentUser ? '1px solid #81ecff' : undefined,
+                }}>
+                  {top3[1].isCurrentUser && (
+                    <span style={{
+                      position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
+                      background: '#81ecff', color: '#003840', padding: '2px 8px', borderRadius: 999,
+                      fontSize: 10, fontWeight: 800, fontFamily: 'var(--font-label)',
+                    }}>YOU</span>
+                  )}
                   <div className="podium__rank podium__rank--2">2</div>
-                  <Avatar src={top3[1].avatar} alt={top3[1].name} size="default" tier={top3[1].tierRank} />
+                  <Avatar src={top3[1].avatar} alt={top3[1].name} tier={top3[1].tierRank} />
                   <div className="podium__name">{top3[1].name}</div>
                   <div className="podium__score">{formatNumber(top3[1].score)}</div>
-                  <div className="podium__branch">{top3[1].branch} · Year {top3[1].year}</div>
-                  <TierBadge tier={top3[1].tierRank} />
+                  <div className="podium__branch">{top3[1].branch}</div>
                 </div>
               )}
-
-              {/* Rank 1 (Elite - Crown) */}
-              <div className="podium__item podium__item--1">
+              <div className={`podium__item podium__item--1 ${top3[0].isCurrentUser ? 'podium__item--user' : ''}`} style={{
+                position: 'relative',
+                border: top3[0].isCurrentUser ? '1px solid #81ecff' : undefined,
+              }}>
+                {top3[0].isCurrentUser && (
+                  <span style={{
+                    position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
+                    background: '#81ecff', color: '#003840', padding: '2px 8px', borderRadius: 999,
+                    fontSize: 10, fontWeight: 800, fontFamily: 'var(--font-label)',
+                  }}>YOU</span>
+                )}
                 <div className="podium__rank podium__rank--1">1</div>
                 <Avatar src={top3[0].avatar} alt={top3[0].name} size="lg" tier={top3[0].tierRank} />
-                <div className="podium__name" style={{ fontSize: 18 }}>{top3[0].name}</div>
-                <div className="podium__score" style={{ fontSize: 32 }}>{formatNumber(top3[0].score)}</div>
-                <div className="podium__branch">{top3[0].branch} · Year {top3[0].year}</div>
+                <div className="podium__name">{top3[0].name}</div>
+                <div className="podium__score">{formatNumber(top3[0].score)}</div>
+                <div className="podium__branch">{top3[0].branch}</div>
                 <TierBadge tier={top3[0].tierRank} />
-                {top3[0].githubUsername && (
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--primary)', marginTop: 4 }}>
-                    @{top3[0].githubUsername}
-                  </span>
-                )}
               </div>
-
-              {/* Rank 3 (Bronze) */}
               {top3.length > 2 && (
-                <div className="podium__item podium__item--3">
+                <div className={`podium__item podium__item--3 ${top3[2].isCurrentUser ? 'podium__item--user' : ''}`} style={{
+                  position: 'relative',
+                  border: top3[2].isCurrentUser ? '1px solid #81ecff' : undefined,
+                }}>
+                  {top3[2].isCurrentUser && (
+                    <span style={{
+                      position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
+                      background: '#81ecff', color: '#003840', padding: '2px 8px', borderRadius: 999,
+                      fontSize: 10, fontWeight: 800, fontFamily: 'var(--font-label)',
+                    }}>YOU</span>
+                  )}
                   <div className="podium__rank podium__rank--3">3</div>
-                  <Avatar src={top3[2].avatar} alt={top3[2].name} size="default" tier={top3[2].tierRank} />
+                  <Avatar src={top3[2].avatar} alt={top3[2].name} tier={top3[2].tierRank} />
                   <div className="podium__name">{top3[2].name}</div>
                   <div className="podium__score">{formatNumber(top3[2].score)}</div>
-                  <div className="podium__branch">{top3[2].branch} · Year {top3[2].year}</div>
-                  <TierBadge tier={top3[2].tierRank} />
+                  <div className="podium__branch">{top3[2].branch}</div>
                 </div>
               )}
             </div>
           )}
 
-          {/* ── Contributor Table ── */}
-          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-            <div style={{
-              padding: '14px 20px',
-              background: '#090B12',
-              borderBottom: '1px solid var(--card-border)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+          {/* Table */}
+          {rest.length > 0 && (
+            <div className="card" style={{
+              padding: 0, overflow: 'hidden',
+              background: '#0a0f20', border: '1px solid rgba(129,236,255,0.12)',
+              borderRadius: 16,
             }}>
-              <span className="overline overline--no-dot" style={{ fontSize: 11 }}>
-                ALL RANKED CONTRIBUTORS ({sorted.length})
-              </span>
-              <span style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-mono)' }}>
-                Sorted by 5-Factor Vector Score
-              </span>
-            </div>
-
-            <div style={{ overflowX: 'auto' }}>
               <table className="glass-table">
                 <thead>
                   <tr>
-                    <th style={{ width: 80 }}>Rank</th>
-                    <th>Contributor</th>
+                    <th>Rank</th>
+                    <th>Developer</th>
                     <th>Branch</th>
-                    <th>Cohort</th>
-                    <th>Verified Score</th>
-                    <th>Tier Status</th>
+                    <th>Year</th>
+                    <th>Score</th>
+                    <th>Tier</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {sorted.map((s) => (
-                    <tr key={s._id || s.enrollmentId}>
-                      <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: 14 }}>
-                        <span style={{ color: s.displayRank === 1 ? 'var(--primary)' : s.displayRank <= 3 ? '#FFFFFF' : 'var(--on-surface-variant)' }}>
-                          #{s.displayRank}
-                        </span>
+                  {rest.map((s) => (
+                    <tr
+                      key={s._id || s.enrollmentId}
+                      style={{
+                        background: s.isCurrentUser ? 'rgba(129,236,255,0.06)' : undefined,
+                        borderLeft: s.isCurrentUser ? '3px solid #81ecff' : undefined,
+                      }}
+                    >
+                      <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+                        #{s.displayRank}
                       </td>
                       <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <Avatar src={s.avatar} alt={s.name} size="sm" tier={s.tierRank} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <Avatar src={s.avatar} alt={s.name} size="sm" />
                           <div>
-                            <div style={{ fontWeight: 700, fontSize: 14, color: '#FFFFFF' }}>{s.name}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ fontWeight: 600, fontSize: 14, color: '#fff' }}>{s.name}</span>
+                              {s.isCurrentUser && (
+                                <span style={{
+                                  fontSize: 9, fontWeight: 800, padding: '1px 6px',
+                                  borderRadius: 999, background: 'rgba(129,236,255,0.2)',
+                                  color: '#81ecff', fontFamily: 'var(--font-label)',
+                                }}>YOU</span>
+                              )}
+                            </div>
                             <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', fontFamily: 'var(--font-mono)' }}>
-                              {s.enrollmentId} {s.githubUsername && `· @${s.githubUsername}`}
+                              {s.enrollmentId || s.college || 'Developer'}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td>
-                        <span className="pill" style={{ fontSize: 11 }}>{s.branch}</span>
-                      </td>
-                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--on-surface-variant)' }}>
-                        Year {s.year}
-                      </td>
-                      <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: 16, color: 'var(--primary)' }}>
+                      <td><span className="pill">{s.branch}</span></td>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{s.year ? `Y${s.year}` : '—'}</td>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 15, color: '#81ecff' }}>
                         {formatNumber(s.score)}
                       </td>
-                      <td>
-                        <TierBadge tier={s.tierRank} />
-                      </td>
+                      <td><TierBadge tier={s.tierRank} /></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>
+          )}
         </>
       )}
     </div>

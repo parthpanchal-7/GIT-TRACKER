@@ -220,13 +220,15 @@ router.get('/google/callback', async (req, res) => {
       );
     }
 
-    const allowedDomains = ['mitsgwalior.in', 'mitsgwl.ac.in'];
-    const emailDomain = googleEmail.split('@')[1];
-
-    if (!allowedDomains.includes(emailDomain)) {
-      return res.redirect(
-        `${process.env.FRONTEND_URL}/login/google/callback?error=invalid_domain`
-      );
+    const allowedDomainsEnv = process.env.ALLOWED_EMAIL_DOMAINS;
+    if (allowedDomainsEnv) {
+      const allowedDomains = allowedDomainsEnv.split(',').map(d => d.trim().toLowerCase());
+      const emailDomain = googleEmail.split('@')[1];
+      if (!allowedDomains.includes(emailDomain)) {
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/login/google/callback?error=invalid_domain`
+        );
+      }
     }
 
     let student = await Student.findOne({ email: googleEmail });
