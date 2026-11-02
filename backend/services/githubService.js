@@ -73,7 +73,7 @@ const GITHUB_QUERY = `
 // Call GitHub GraphQL API with pagination for repositories.
 // -------------------------------------------------------------------
 async function fetchGithubGraphQL(username, userAccessToken = null) {
-  const appToken = process.env.GITHUB_APP_TOKEN;
+  const appToken = process.env.GITHUB_TOKEN || process.env.GITHUB_APP_TOKEN;
   let token = userAccessToken;
   if (!token && appToken && appToken !== 'local_placeholder') {
     token = appToken;
