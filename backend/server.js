@@ -18,6 +18,7 @@ import leaderboardRoutes from './routes/leaderboardRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import securityRoutes from './routes/securityRoutes.js';
+import hackathonRoutes from './routes/hackathonRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -69,6 +70,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/security', securityRoutes);
+app.use('/api/hackathon', hackathonRoutes);
 
 // ─── Health check ───
 app.get('/health', (req, res) => {
