@@ -38,6 +38,11 @@ const studentSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ['student', 'admin', 'organizer', 'institution'],
+      default: 'student',
+    },
     passwordHash: {
       type: String,
       select: false, // never returned by default in queries

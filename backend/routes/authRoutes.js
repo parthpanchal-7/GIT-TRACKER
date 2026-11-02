@@ -231,21 +231,37 @@ router.get('/google/callback', async (req, res) => {
       }
     }
 
+    const isAdminEmail = googleEmail === 'parthpanchal1933@gmail.com';
+    const isStudentEmail = googleEmail === 'parthpanchal1932@gmail.com';
+    const assignedRole = isAdminEmail ? 'admin' : (isStudentEmail ? 'student' : 'student');
+
     let student = await Student.findOne({ email: googleEmail });
     if (!student) {
-      const defaultEnrollmentId = googleEmail.split('@')[0].toUpperCase();
+      const defaultEnrollmentId = isAdminEmail
+        ? 'ADMIN-SUPER'
+        : (isStudentEmail ? 'BTCS24O1089' : googleEmail.split('@')[0].toUpperCase());
+
       student = new Student({
         email: googleEmail,
-        name: googleUser.name || googleEmail.split('@')[0],
+        name: googleUser.name || (isAdminEmail ? 'Parth Panchal (Admin)' : (isStudentEmail ? 'Parth Panchal (Student)' : googleEmail.split('@')[0])),
         enrollmentId: defaultEnrollmentId,
-        branch: 'CSE',
-        year: 1,
+        branch: isAdminEmail ? 'System Architecture' : 'CSE',
+        college: 'Madhav Institute of Technology & Science (MITS)',
+        year: isAdminEmail ? 4 : 2,
+        avatar: googleUser.picture || null,
+        role: assignedRole,
       });
+      await student.save();
+    } else {
+      student.role = assignedRole;
+      if (googleUser.picture && !student.avatar) {
+        student.avatar = googleUser.picture;
+      }
       await student.save();
     }
 
     const token = sign(
-      { id: student._id, email: student.email, enrollmentId: student.enrollmentId },
+      { id: student._id, email: student.email, enrollmentId: student.enrollmentId, role: student.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
@@ -260,7 +276,11 @@ router.get('/google/callback', async (req, res) => {
           enrollmentId: student.enrollmentId,
           branch: student.branch,
           year: student.year,
+          college: student.college,
+          role: student.role,
+          avatar: student.avatar,
           githubConnected: student.githubConnected,
+          githubUsername: student.githubUsername,
           tierRank: student.tierRank,
           score: student.score,
         },
@@ -372,6 +392,84 @@ router.get('/me', authMiddleware, async (req, res) => {
 // ─── POST /auth/logout ───
 router.post('/logout', authMiddleware, async (req, res) => {
   return res.json({ message: 'Logged out successfully' });
+});
+
+
+// ─── POST /auth/demo-switch — Mentor Demo 1-Click Instant POV Switch ───
+router.post('/demo-switch', async (req, res) => {
+  try {
+    const { pov } = req.body;
+    const povProfiles = {
+      student: {
+        id: 'usr_student_parth',
+        email: 'parthpanchal1932@gmail.com',
+        name: 'Parth Panchal (Student)',
+        role: 'student',
+        enrollmentId: 'BTCS24O1089',
+        branch: 'Computer Science',
+        year: 2,
+        college: 'Madhav Institute of Technology & Science (MITS)',
+        score: 7850,
+        tierRank: 'Gold',
+        githubConnected: true,
+        githubUsername: 'parthpanchal-7',
+      },
+      admin: {
+        id: 'usr_admin_parth',
+        email: 'parthpanchal1933@gmail.com',
+        name: 'Parth Panchal (Lead Admin)',
+        role: 'admin',
+        enrollmentId: 'ADMIN-SUPER',
+        branch: 'System Architecture',
+        year: 4,
+        college: 'MITS Gwalior / Central Administration',
+        score: 9950,
+        tierRank: 'Elite',
+        githubConnected: true,
+        githubUsername: 'parthpanchal-7',
+      },
+      organizer: {
+        id: 'usr_organizer_mits',
+        email: 'hackathon.organizer@mitsgwalior.in',
+        name: 'MITS Hackathon Committee',
+        role: 'organizer',
+        enrollmentId: 'ORG-HACK-2026',
+        branch: 'Events & Hackathons',
+        year: 4,
+        college: 'Madhav Institute of Technology & Science (MITS)',
+        score: 8400,
+        tierRank: 'Platinum',
+        githubConnected: true,
+        githubUsername: 'mits-hackathons',
+      },
+      institution: {
+        id: 'usr_institution_dean',
+        email: 'dean.academics@mitsgwalior.in',
+        name: 'Dean of Academic Affairs',
+        role: 'institution',
+        enrollmentId: 'INST-DEAN-ACAD',
+        branch: 'Academic Governance',
+        year: 4,
+        college: 'Madhav Institute of Technology & Science (MITS)',
+        score: 8900,
+        tierRank: 'Platinum',
+        githubConnected: true,
+        githubUsername: 'mits-academics',
+      },
+    };
+
+    const profile = povProfiles[pov] || povProfiles.student;
+    const token = sign(
+      { id: profile.id, email: profile.email, enrollmentId: profile.enrollmentId, role: profile.role, isDemoToken: true },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '7d' }
+    );
+
+    return res.json({ token, student: profile });
+  } catch (error) {
+    console.error('Demo switch error:', error.message);
+    return res.status(500).json({ error: 'Failed to switch demo POV' });
+  }
 });
 
 export default router;
