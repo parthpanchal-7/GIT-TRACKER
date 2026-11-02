@@ -352,6 +352,10 @@ export default function AntiCheatPage() {
   const [scanMode, setScanMode] = useState('deep');
   const [searchFilter, setSearchFilter] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [simPillar, setSimPillar] = useState('ai');
+  const [simAiVal, setSimAiVal] = useState(84);
+  const [simCollisionVal, setSimCollisionVal] = useState(62);
+  const [simOrganicVal, setSimOrganicVal] = useState(91);
 
   const scanSteps = [
     'Connecting to GitHub API & querying repository tree...',
@@ -604,6 +608,278 @@ export default function AntiCheatPage() {
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 20px 60px' }}>
+      {/* ── SLEEK HIGH-CONTRAST COMING SOON BANNER (PHASE 2 ROLLOUT) ── */}
+      <div style={{
+        padding: '20px 24px', borderRadius: 16,
+        background: 'rgba(245, 158, 11, 0.08)',
+        border: '1.5px solid #F59E0B',
+        boxShadow: '0 0 35px rgba(245, 158, 11, 0.18)',
+        marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        flexWrap: 'wrap', gap: 16,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 12,
+            background: 'rgba(245, 158, 11, 0.2)', border: '1px solid #F59E0B',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
+          }}>
+            ⚡
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <span style={{
+                fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 900,
+                color: '#F59E0B', letterSpacing: '0.03em',
+              }}>
+                DEEP AST & CODEQUIRY FORENSIC ENGINE — COMING SOON (PHASE 2 ROLLOUT)
+              </span>
+              <span style={{
+                padding: '2px 8px', borderRadius: 999, fontSize: 10,
+                background: '#F59E0B', color: '#04060F', fontWeight: 800, fontFamily: 'var(--font-mono)',
+              }}>
+                STAGING PHASE 2
+              </span>
+            </div>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.4 }}>
+              Full AST cross-repository plagiarism scanning across 14M+ open-source indexes and multi-student codebase isomorphism is in final staging. Explore the live <strong>Forensic Preview Simulator</strong> below.
+            </p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: 12, fontFamily: 'var(--font-mono)', color: '#F59E0B', fontWeight: 700 }}>
+            Cluster v3.0-rc2
+          </span>
+        </div>
+      </div>
+
+      {/* ── INTERACTIVE FORENSIC PREVIEW SIMULATOR (The 3 Pillars) ── */}
+      <div className="card" style={{
+        padding: 24, borderRadius: 16,
+        background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
+        marginBottom: 28,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 20 }}>🔬</span>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, margin: 0 }}>
+                Interactive Forensic Preview Simulator
+              </h2>
+            </div>
+            <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--on-surface-variant)' }}>
+              Heuristic & neural preview engine demonstrating the 3 core code integrity pillars before Phase 2 cluster launch.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {[
+              { id: 'ai', label: '1. AI Synthesis Entropy', icon: '🧠', color: '#ff716c' },
+              { id: 'collision', label: '2. Cohort Collision', icon: '🔍', color: '#F59E0B' },
+              { id: 'human', label: '3. Human Craftsmanship', icon: '🧑‍💻', color: '#BFF549' },
+            ].map(p => (
+              <button
+                key={p.id}
+                onClick={() => setSimPillar(p.id)}
+                style={{
+                  padding: '7px 14px', borderRadius: 8, fontSize: 12,
+                  fontFamily: 'var(--font-label)', fontWeight: 700, cursor: 'pointer',
+                  border: simPillar === p.id ? `1px solid ${p.color}` : '1px solid var(--border-subtle)',
+                  background: simPillar === p.id ? `${p.color}22` : 'rgba(255,255,255,0.02)',
+                  color: simPillar === p.id ? p.color : 'var(--on-surface-variant)',
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>{p.icon}</span> {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Pillar 1: AI Synthesis Entropy */}
+        {simPillar === 'ai' && (
+          <div style={{
+            padding: 20, borderRadius: 12, background: 'rgba(255, 113, 108, 0.04)',
+            border: '1px solid rgba(255, 113, 108, 0.25)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#ff716c' }}>
+                  Pillar 1 · AI Synthesis Entropy (ChatGPT / Claude / Copilot)
+                </span>
+                <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 2 }}>
+                  Detects low-perplexity token distribution, boilerplate prompt markers, and abnormal velocity commits (e.g. 3,800 lines in 45s).
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 800, color: '#ff716c' }}>
+                  {simAiVal}% AI Weight
+                </span>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={simAiVal}
+                onChange={e => setSimAiVal(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: '#ff716c', cursor: 'pointer' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--on-surface-variant)' }}>
+                <span>0% Human Authored</span>
+                <span>50% Hybrid Scaffolding</span>
+                <span>100% Synthetic LLM Output</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Token Entropy Model</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#ff716c', marginTop: 2 }}>
+                  {simAiVal > 60 ? 'Unusually Predictable' : 'Normal Variance'}
+                </div>
+              </div>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Prompt Artifact Markers</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: simAiVal > 50 ? '#ff716c' : '#34d399', marginTop: 2 }}>
+                  {simAiVal > 50 ? 'Scaffolding Detected' : 'None Detected'}
+                </div>
+              </div>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Perplexity Score</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#ff716c', marginTop: 2 }}>
+                  {(100 - simAiVal) * 0.4 + 12} bits/token
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pillar 2: Cohort Repository Collision */}
+        {simPillar === 'collision' && (
+          <div style={{
+            padding: 20, borderRadius: 12, background: 'rgba(245, 158, 11, 0.04)',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#F59E0B' }}>
+                  Pillar 2 · Cohort Repository Collision & Cross-Student Clones
+                </span>
+                <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 2 }}>
+                  Detects isomorphic variable renaming, identical AST subtrees, and shared assignment solutions across submissions.
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 800, color: '#F59E0B' }}>
+                  {simCollisionVal}% Similarity
+                </span>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={simCollisionVal}
+                onChange={e => setSimCollisionVal(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: '#F59E0B', cursor: 'pointer' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--on-surface-variant)' }}>
+                <span>0% Unique Architecture</span>
+                <span>40% Standard Boilerplate</span>
+                <span>100% Direct Codebase Clone</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Subtree Isomorphism</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#F59E0B', marginTop: 2 }}>
+                  {simCollisionVal > 50 ? 'Structural Match Found' : 'Clean AST Subtrees'}
+                </div>
+              </div>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Variable Renaming Check</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#F59E0B', marginTop: 2 }}>
+                  {simCollisionVal > 40 ? 'Obfuscated Renames (Flagged)' : 'Bespoke Naming'}
+                </div>
+              </div>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Cross-Index Matched Repos</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#F59E0B', marginTop: 2 }}>
+                  {Math.round(simCollisionVal / 15)} Public Repositories
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pillar 3: Organic Human Craftsmanship */}
+        {simPillar === 'human' && (
+          <div style={{
+            padding: 20, borderRadius: 12, background: 'rgba(191, 245, 73, 0.04)',
+            border: '1.5px solid rgba(191, 245, 73, 0.25)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#BFF549' }}>
+                  Pillar 3 · Organic Human Craftsmanship & Iterative Verification
+                </span>
+                <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 2 }}>
+                  Rewards multi-week commit cadence, refactor commits, compiler error recovery iterations, and unique design patterns.
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 800, color: '#BFF549' }}>
+                  {simOrganicVal}% Human Craft
+                </span>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={simOrganicVal}
+                onChange={e => setSimOrganicVal(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: '#BFF549', cursor: 'pointer' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--on-surface-variant)' }}>
+                <span>0% Non-Human</span>
+                <span>60% Standard Practice</span>
+                <span>100% Exemplary Craftsmanship</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Incremental Commit Graph</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#BFF549', marginTop: 2 }}>
+                  ✓ Natural Multi-Day Cadence
+                </div>
+              </div>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Debugging & Typo Fixes</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#BFF549', marginTop: 2 }}>
+                  ✓ Organic Error Recovery Found
+                </div>
+              </div>
+              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Leaderboard Cleared</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#BFF549', marginTop: 2 }}>
+                  ✓ Low Risk / Approved
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* ── TOP HEADER ── */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',

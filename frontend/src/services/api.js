@@ -79,4 +79,12 @@ export const hackathonAPI = {
   auditRepo: (data) => api.post('/api/hackathon/audit-repo', data),
 };
 
+
+// ─── Admin & Anomaly Queue ───
+export const adminAPI = {
+  getAnomalyQueue: (params) => api.get('/api/leaderboard/admin/flags', { params }),
+  reviewFlag: (enrollmentId, data) => api.patch(`/api/leaderboard/admin/flags/${enrollmentId}/review`, data),
+  getSystemHealth: () => api.get('/health'),
+};
+
 export default api;
