@@ -1,6 +1,6 @@
 import { useTheme } from '../context/ThemeContext';
 
-/* ─── Lime Geometric G Logo Mark ─── */
+/* ─── Lime Geometric G Logo Mark (Brand Logo v2) ─── */
 export function Logo({ size = 36, className = '', style = {} }) {
   return (
     <div
@@ -13,34 +13,44 @@ export function Logo({ size = 36, className = '', style = {} }) {
         height: size,
         borderRadius: Math.round(size * 0.28),
         background: '#04060F',
-        border: '1px solid rgba(191, 245, 73, 0.25)',
-        boxShadow: '0 0 16px rgba(191, 245, 73, 0.2)',
+        border: '1px solid rgba(191, 245, 73, 0.35)',
+        boxShadow: '0 0 20px rgba(191, 245, 73, 0.25)',
         overflow: 'hidden',
         flexShrink: 0,
         ...style,
       }}
     >
       <img
-        src="/logo.png"
-        alt="GitTracker Logo"
+        src="/gittrackerlogov2.png"
+        alt="GitTracker Logo v2"
         width={size}
         height={size}
         style={{
           width: '100%',
           height: '100%',
-          objectFit: 'contain',
+          objectFit: 'cover',
           display: 'block',
         }}
         onError={(e) => {
+          if (e.target.src.indexOf('gittrackerlogov2.png') !== -1) {
+            e.target.src = '/logo.png';
+            return;
+          }
           e.target.style.display = 'none';
           if (e.target.parentNode) {
             e.target.parentNode.innerHTML = `
-              <svg viewBox="0 0 48 48" width="${size}" height="${size}" fill="none">
-                <rect width="48" height="48" rx="14" fill="#04060F"/>
-                <circle cx="24" cy="24" r="16" stroke="#BFF549" stroke-width="3" stroke-dasharray="14 6" stroke-linecap="round"/>
-                <circle cx="24" cy="24" r="9" stroke="#BFF549" stroke-width="2.5" stroke-dasharray="8 4" stroke-linecap="round"/>
-                <circle cx="24" cy="24" r="4.5" fill="#BFF549"/>
-                <path d="M24 24H36" stroke="#BFF549" stroke-width="3" stroke-linecap="round"/>
+              <svg viewBox="0 0 64 64" width="${size}" height="${size}" fill="none">
+                <rect width="64" height="64" rx="18" fill="#04060F"/>
+                <!-- Outer circuit loop -->
+                <path d="M32 8 C 45.2 8, 56 18.8, 56 32 C 56 45.2, 45.2 56, 32 56 C 18.8 56, 8 45.2, 8 32 C 8 18.8, 18.8 8, 32 8 Z" stroke="#BFF549" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="100 18"/>
+                <!-- Mid maze ring -->
+                <path d="M32 16 C 40.8 16, 48 23.2, 48 32 C 48 40.8, 40.8 48, 32 48 C 23.2 48, 16 40.8, 16 32" stroke="#BFF549" stroke-width="4" stroke-linecap="round"/>
+                <!-- Inner commit circle -->
+                <circle cx="32" cy="32" r="7.5" stroke="#BFF549" stroke-width="3.5" fill="none"/>
+                <circle cx="32" cy="32" r="3.2" fill="#BFF549"/>
+                <!-- G crossbar circuit track -->
+                <path d="M32 32 H 49" stroke="#BFF549" stroke-width="4" stroke-linecap="round"/>
+                <path d="M32 16 V 24.5" stroke="#BFF549" stroke-width="4" stroke-linecap="round"/>
               </svg>
             `;
           }

@@ -3,17 +3,69 @@ import { useAuth } from '../context/AuthContext';
 import { Avatar, Logo, ThemeToggle } from './ui';
 
 export default function Sidebar() {
-  const { user, logout, switchPOV } = useAuth();
+  const { user, logout, switchPOV, activePov, isStudent, isOrganizer, isMentor, isAdmin } = useAuth();
 
-  const navItems = [
-    { to: '/Home', label: 'Home', icon: '⌂', end: true },
-    { to: '/dashboard', label: 'Dashboard', icon: '◈' },
-    { to: '/leaderboard', label: 'Leaderboard', icon: '⬡' },
-    { to: '/profile', label: 'Score Details', icon: '◎' },
-    { to: '/hackathon', label: 'Hackathon Manager', icon: '🏆' },
-    { to: '/anti-cheat', label: 'Anti-Cheat', icon: '🛡️' },
-    { to: '/settings', label: 'Settings', icon: '⚙' },
-  ];
+  // Strict role-gated navigation items based on active POV
+  const getNavItems = () => {
+    if (activePov === 'student') {
+      return [
+        { to: '/Home', label: 'Home', icon: '⌂', end: true },
+        { to: '/dashboard', label: 'Dashboard', icon: '◈' },
+        { to: '/leaderboard', label: 'Leaderboard', icon: '⬡' },
+        { to: '/hackathon', label: 'Hackathon Portal', icon: '🏆' },
+        { to: '/profile', label: 'Score Details', icon: '◎' },
+        { to: '/settings', label: 'Settings', icon: '⚙' },
+      ];
+    }
+
+    if (activePov === 'organizer') {
+      return [
+        { to: '/Home', label: 'Home', icon: '⌂', end: true },
+        { to: '/dashboard', label: 'Institution Overview', icon: '🏛️' },
+        { to: '/hackathon', label: 'Organizer Console (9-Mod)', icon: '🏆' },
+        { to: '/leaderboard', label: 'Campus Leaderboard', icon: '⬡' },
+        { to: '/settings', label: 'Settings', icon: '⚙' },
+      ];
+    }
+
+    if (activePov === 'mentor') {
+      return [
+        { to: '/Home', label: 'Home', icon: '⌂', end: true },
+        { to: '/hackathon', label: 'Mentor Evaluation', icon: '🧠' },
+        { to: '/leaderboard', label: 'Campus Leaderboard', icon: '⬡' },
+        { to: '/settings', label: 'Settings', icon: '⚙' },
+      ];
+    }
+
+    // Admin POV: Full Platform Access
+    return [
+      { to: '/Home', label: 'Home', icon: '⌂', end: true },
+      { to: '/dashboard', label: 'Dashboard', icon: '◈' },
+      { to: '/leaderboard', label: 'Leaderboard', icon: '⬡' },
+      { to: '/profile', label: 'Score Details', icon: '◎' },
+      { to: '/hackathon', label: 'Hackathon Manager', icon: '🏆' },
+      { to: '/anti-cheat', label: 'Anti-Cheat', icon: '🛡️' },
+      { to: '/settings', label: 'Admin & Health', icon: '⚙' },
+    ];
+  };
+
+  const navItems = getNavItems();
+
+  const getRoleBadge = () => {
+    switch (activePov) {
+      case 'organizer':
+        return { label: 'ORGANIZER & INST', color: '#81ecff', bg: 'rgba(129,236,255,0.15)' };
+      case 'mentor':
+        return { label: 'MENTOR JURY', color: '#d674ff', bg: 'rgba(214,116,255,0.15)' };
+      case 'admin':
+        return { label: 'LEAD ADMIN', color: '#ff716c', bg: 'rgba(255,113,108,0.15)' };
+      case 'student':
+      default:
+        return { label: 'STUDENT DEV', color: '#BFF549', bg: 'rgba(191,245,73,0.15)' };
+    }
+  };
+
+  const badge = getRoleBadge();
 
   return (
     <nav className="sidebar">
@@ -23,7 +75,7 @@ export default function Sidebar() {
         <div className="sidebar__logo-text">GitTracker</div>
       </NavLink>
 
-      {/* ── MENTOR DEMO 1-CLICK INSTANT POV QUICK-SWITCH ── */}
+      {/* ── MENTOR DEMO 1-CLICK INSTANT POV QUICK-SWITCH (4 POVs) ── */}
       <div style={{ padding: '0 14px 16px' }}>
         <div style={{
           background: 'rgba(191, 245, 73, 0.05)',
@@ -36,11 +88,11 @@ export default function Sidebar() {
               ⚡ DEMO POV
             </span>
             <span style={{
-              fontSize: 9, fontWeight: 800, padding: '1px 6px', borderRadius: 4,
-              background: '#04060F', color: '#BFF549', border: '1px solid rgba(191,245,73,0.3)',
+              fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 4,
+              background: '#04060F', color: badge.color, border: `1px solid ${badge.color}40`,
               fontFamily: 'var(--font-mono)',
             }}>
-              {user?.role?.toUpperCase() || 'STUDENT'}
+              {badge.label}
             </span>
           </div>
 
@@ -51,8 +103,8 @@ export default function Sidebar() {
               title="Student POV: parthpanchal1932@gmail.com"
               style={{
                 padding: '6px 2px', borderRadius: 6, border: 'none', cursor: 'pointer',
-                background: user?.email === 'parthpanchal1932@gmail.com' ? '#BFF549' : 'rgba(255,255,255,0.06)',
-                color: user?.email === 'parthpanchal1932@gmail.com' ? '#04060F' : 'var(--text-secondary)',
+                background: activePov === 'student' ? '#BFF549' : 'rgba(255,255,255,0.06)',
+                color: activePov === 'student' ? '#04060F' : 'var(--text-secondary)',
                 fontSize: 10, fontWeight: 800, fontFamily: 'var(--font-label)', textAlign: 'center',
                 transition: 'all 0.15s ease',
               }}
@@ -63,11 +115,11 @@ export default function Sidebar() {
             <button
               type="button"
               onClick={() => switchPOV('organizer')}
-              title="Hackathon Organizer POV"
+              title="Organizer & Institute POV (Merged): parthpanchal1933@gmail.com"
               style={{
                 padding: '6px 2px', borderRadius: 6, border: 'none', cursor: 'pointer',
-                background: user?.role === 'organizer' ? '#81ecff' : 'rgba(255,255,255,0.06)',
-                color: user?.role === 'organizer' ? '#003840' : 'var(--text-secondary)',
+                background: activePov === 'organizer' ? '#81ecff' : 'rgba(255,255,255,0.06)',
+                color: activePov === 'organizer' ? '#003840' : 'var(--text-secondary)',
                 fontSize: 10, fontWeight: 800, fontFamily: 'var(--font-label)', textAlign: 'center',
                 transition: 'all 0.15s ease',
               }}
@@ -77,17 +129,17 @@ export default function Sidebar() {
 
             <button
               type="button"
-              onClick={() => switchPOV('institution')}
-              title="Institution POV"
+              onClick={() => switchPOV('mentor')}
+              title="Mentor POV: dr.sharma@mits.ac.in"
               style={{
                 padding: '6px 2px', borderRadius: 6, border: 'none', cursor: 'pointer',
-                background: user?.role === 'institution' ? '#d674ff' : 'rgba(255,255,255,0.06)',
-                color: user?.role === 'institution' ? '#390050' : 'var(--text-secondary)',
+                background: activePov === 'mentor' ? '#d674ff' : 'rgba(255,255,255,0.06)',
+                color: activePov === 'mentor' ? '#390050' : 'var(--text-secondary)',
                 fontSize: 10, fontWeight: 800, fontFamily: 'var(--font-label)', textAlign: 'center',
                 transition: 'all 0.15s ease',
               }}
             >
-              INST
+              MTR
             </button>
 
             <button
@@ -96,8 +148,8 @@ export default function Sidebar() {
               title="Admin POV: parthpanchal1933@gmail.com"
               style={{
                 padding: '6px 2px', borderRadius: 6, border: 'none', cursor: 'pointer',
-                background: user?.email === 'parthpanchal1933@gmail.com' ? '#ff716c' : 'rgba(255,255,255,0.06)',
-                color: user?.email === 'parthpanchal1933@gmail.com' ? '#5a0c0a' : 'var(--text-secondary)',
+                background: activePov === 'admin' ? '#ff716c' : 'rgba(255,255,255,0.06)',
+                color: activePov === 'admin' ? '#5a0c0a' : 'var(--text-secondary)',
                 fontSize: 10, fontWeight: 800, fontFamily: 'var(--font-label)', textAlign: 'center',
                 transition: 'all 0.15s ease',
               }}
