@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Avatar } from './ui';
+import { Avatar, Logo, ThemeToggle } from './ui';
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
@@ -17,9 +17,9 @@ export default function Sidebar() {
 
   return (
     <nav className="sidebar">
-      {/* Logo */}
+      {/* Brand & Lime Geometric G Logo Mark */}
       <NavLink to="/Home" className="sidebar__logo" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <div className="sidebar__logo-icon">G</div>
+        <Logo size={36} />
         <div className="sidebar__logo-text">GitTracker</div>
       </NavLink>
 
@@ -38,6 +38,11 @@ export default function Sidebar() {
             {item.label}
           </NavLink>
         ))}
+      </div>
+
+      {/* Visible Theme Toggle Button */}
+      <div style={{ padding: '0 16px 14px' }}>
+        <ThemeToggle style={{ width: '100%' }} />
       </div>
 
       {/* User section */}

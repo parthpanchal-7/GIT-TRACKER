@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { CosmicBackground } from '../components/ui';
+import { CosmicBackground, Logo } from '../components/ui';
 
 function readCallbackData(hash, search) {
   const cleanHash = hash.startsWith('#') ? hash.slice(1) : hash;
