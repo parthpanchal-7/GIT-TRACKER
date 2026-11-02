@@ -146,21 +146,8 @@ export default function LoginPage() {
               onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.04)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              <div style={{
-                width: 56,
-                height: 56,
-                borderRadius: 16,
-                margin: '0 auto 14px',
-                background: 'linear-gradient(135deg, #81ecff, #d674ff)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 900,
-                fontSize: 28,
-                color: '#003840',
-                boxShadow: '0 0 32px rgba(129,236,255,0.35)',
-              }}>
-                G
+              <div style={{ margin: '0 auto 14px', display: 'flex', justifyContent: 'center' }}>
+                <Logo size={56} />
               </div>
               <h1 style={{
                 fontFamily: 'var(--font-display)',
@@ -343,6 +330,38 @@ export default function LoginPage() {
 
                 <button
                   type="button"
+                  onClick={() => handleQuickSwitch('organizer')}
+                  style={{
+                    padding: '10px 10px', borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#81ecff', marginBottom: 2 }}>🏆 Organizer & Inst POV</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    parthpanchal1933@gmail.com
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickSwitch('mentor')}
+                  style={{
+                    padding: '10px 10px', borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#d674ff', marginBottom: 2 }}>🧠 Mentor POV</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    dr.sharma@mits.ac.in
+                  </div>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => handleQuickSwitch('admin')}
                   style={{
                     padding: '10px 10px', borderRadius: 8,
@@ -354,38 +373,6 @@ export default function LoginPage() {
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#ff716c', marginBottom: 2 }}>⚡ Admin POV</div>
                   <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     parthpanchal1933@gmail.com
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickSwitch('organizer')}
-                  style={{
-                    padding: '10px 10px', borderRadius: 8,
-                    background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#81ecff', marginBottom: 2 }}>🏆 Organizer POV</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    Hackathon Suite
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickSwitch('institution')}
-                  style={{
-                    padding: '10px 10px', borderRadius: 8,
-                    background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#d674ff', marginBottom: 2 }}>🏛️ Institution POV</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    Dean Cohorts
                   </div>
                 </button>
               </div>

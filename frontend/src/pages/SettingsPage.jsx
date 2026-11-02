@@ -211,7 +211,7 @@ function AccountSection({ user, logout, updateUser }) {
     setDisconnecting(true);
     try {
       await studentAPI.disconnectGithub();
-    } catch {}
+    } catch { }
     if (updateUser) updateUser({ githubConnected: false, githubUsername: '' });
     setDisconnecting(false);
     setActionMessage('GitHub account unlinked.');

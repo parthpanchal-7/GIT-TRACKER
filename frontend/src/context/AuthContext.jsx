@@ -18,6 +18,38 @@ export const DEMO_POVS = {
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
     bio: 'CS Undergrad building developer tooling and real-time contribution scoring systems.',
   },
+  organizer: {
+    _id: 'usr_organizer_mits',
+    email: 'parthpanchal1933@gmail.com',
+    name: 'Parth Panchal (Organizer & Institute Lead)',
+    role: 'organizer',
+    enrollmentId: 'ORG-INST-2026',
+    branch: 'Events & Academic Governance',
+    year: 4,
+    college: 'Madhav Institute of Technology & Science (MITS)',
+    score: 8900,
+    tierRank: 'Platinum',
+    githubConnected: true,
+    githubUsername: 'parthpanchal-7',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
+    bio: 'Merged Hackathon Organizer and Institution Dean managing event integrity and cohort telemetry.',
+  },
+  mentor: {
+    _id: 'usr_mentor_sharma',
+    email: 'dr.sharma@mits.ac.in',
+    name: 'Dr. S. K. Sharma (Senior Technical Mentor)',
+    role: 'mentor',
+    enrollmentId: 'MTR-TECH-04',
+    branch: 'Computer Science & Engineering',
+    year: 4,
+    college: 'MITS Evaluation Committee',
+    score: 9200,
+    tierRank: 'Platinum',
+    githubConnected: true,
+    githubUsername: 'sk-sharma-prof',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
+    bio: 'Senior Technical Evaluator inspecting team AST regularity, commit timelines, and rubric scoring.',
+  },
   admin: {
     _id: 'usr_admin_parth',
     email: 'parthpanchal1933@gmail.com',
@@ -34,37 +66,22 @@ export const DEMO_POVS = {
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
     bio: 'Platform architect managing campus scoring rubrics, anti-cheat models, and event infrastructure.',
   },
-  organizer: {
-    _id: 'usr_organizer_mits',
-    email: 'hackathon.organizer@mitsgwalior.in',
-    name: 'MITS Hackathon Committee',
-    role: 'organizer',
-    enrollmentId: 'ORG-HACK-2026',
-    branch: 'Events & Hackathons',
-    year: 4,
-    college: 'Madhav Institute of Technology & Science (MITS)',
-    score: 8400,
-    tierRank: 'Platinum',
-    githubConnected: true,
-    githubUsername: 'mits-hackathons',
-    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
-    bio: 'Official MITS Hackathon coordinating team managing real-time track authenticity and team repos.',
-  },
+  // Backward compatibility alias for institution
   institution: {
-    _id: 'usr_institution_dean',
-    email: 'dean.academics@mitsgwalior.in',
-    name: 'Dean of Academic Affairs',
-    role: 'institution',
-    enrollmentId: 'INST-DEAN-ACAD',
-    branch: 'Academic Governance',
+    _id: 'usr_organizer_mits',
+    email: 'parthpanchal1933@gmail.com',
+    name: 'Parth Panchal (Organizer & Institute Lead)',
+    role: 'organizer',
+    enrollmentId: 'ORG-INST-2026',
+    branch: 'Events & Academic Governance',
     year: 4,
     college: 'Madhav Institute of Technology & Science (MITS)',
     score: 8900,
     tierRank: 'Platinum',
     githubConnected: true,
-    githubUsername: 'mits-academics',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
-    bio: 'Campus-wide academic benchmarking and branch cohort telemetry monitor.',
+    githubUsername: 'parthpanchal-7',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
+    bio: 'Merged Hackathon Organizer and Institution Dean managing event integrity and cohort telemetry.',
   },
 };
 
@@ -72,6 +89,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('gt_token'));
+  const [activePov, setActivePov] = useState(() => localStorage.getItem('gt_active_pov') || 'student');
   const [user, setUser] = useState(() => {
     const cached = localStorage.getItem('gt_user');
     if (cached) {
@@ -81,7 +99,7 @@ export function AuthProvider({ children }) {
         return null;
       }
     }
-    return null;
+    return DEMO_POVS.student;
   });
   const [loading, setLoading] = useState(true);
 
@@ -97,9 +115,14 @@ export function AuthProvider({ children }) {
       const res = await authAPI.me();
       if (res.data?.student) {
         const student = res.data.student;
-        // Guarantee admin role assignment for parthpanchal1933@gmail.com
         if (student.email === 'parthpanchal1933@gmail.com') {
-          student.role = 'admin';
+          // If parthpanchal1933@gmail.com, respect the active POV if set to organizer or admin
+          const savedPov = localStorage.getItem('gt_active_pov');
+          if (savedPov === 'organizer') {
+            student.role = 'organizer';
+          } else {
+            student.role = 'admin';
+          }
         } else if (student.email === 'parthpanchal1932@gmail.com') {
           student.role = 'student';
         }
@@ -111,7 +134,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('gt_token');
         localStorage.removeItem('gt_user');
         setToken(null);
-        setUser(null);
+        setUser(DEMO_POVS.student);
       } else {
         const cached = localStorage.getItem('gt_user');
         if (cached) {
@@ -132,33 +155,55 @@ export function AuthProvider({ children }) {
   }, [fetchUser]);
 
   // Complete Google OAuth login
-  const completeOAuthLogin = useCallback((newToken, userData) => {
-    if (userData.email === 'parthpanchal1933@gmail.com') {
-      userData.role = 'admin';
-    } else if (userData.email === 'parthpanchal1932@gmail.com') {
-      userData.role = 'student';
+  const completeOAuthLogin = useCallback((newToken, userData, povKey = null) => {
+    const cleanEmail = (userData.email || '').toLowerCase();
+    let assignedRole = userData.role || 'student';
+    let targetPov = povKey;
+
+    if (cleanEmail === 'parthpanchal1933@gmail.com') {
+      assignedRole = povKey === 'organizer' ? 'organizer' : 'admin';
+      targetPov = targetPov || (assignedRole === 'organizer' ? 'organizer' : 'admin');
+    } else if (cleanEmail === 'parthpanchal1932@gmail.com') {
+      assignedRole = 'student';
+      targetPov = 'student';
+    } else if (userData.role === 'mentor' || cleanEmail.includes('mentor') || cleanEmail.includes('dr.sharma')) {
+      assignedRole = 'mentor';
+      targetPov = 'mentor';
+    } else {
+      targetPov = targetPov || assignedRole;
     }
+
+    const enrichedUser = { ...userData, role: assignedRole };
     localStorage.setItem('gt_token', newToken);
-    localStorage.setItem('gt_user', JSON.stringify(userData));
+    localStorage.setItem('gt_user', JSON.stringify(enrichedUser));
+    if (targetPov) {
+      localStorage.setItem('gt_active_pov', targetPov);
+      setActivePov(targetPov);
+    }
+
     setToken(newToken);
-    setUser(userData);
+    setUser(enrichedUser);
   }, []);
 
-  // Mentor Demo 1-Click Instant POV Switcher
+  // Demo 1-Click Instant POV Switcher (Student, Organizer & Institute, Mentor, Admin)
   const switchPOV = useCallback(async (povKey) => {
-    const targetProfile = DEMO_POVS[povKey] || DEMO_POVS.student;
+    const resolvedKey = povKey === 'institution' ? 'organizer' : povKey;
+    const targetProfile = DEMO_POVS[resolvedKey] || DEMO_POVS.student;
+    setActivePov(resolvedKey);
+    localStorage.setItem('gt_active_pov', resolvedKey);
+
     try {
-      const res = await authAPI.demoSwitch(povKey);
+      const res = await authAPI.demoSwitch(resolvedKey);
       if (res.data?.token && res.data?.student) {
-        completeOAuthLogin(res.data.token, res.data.student);
+        completeOAuthLogin(res.data.token, res.data.student, resolvedKey);
         return res.data.student;
       }
     } catch {
-      // Offline fallback
+      // Offline / ephemeral fallback
     }
 
-    const mockToken = 'mock_jwt_' + povKey + '_' + Date.now();
-    completeOAuthLogin(mockToken, targetProfile);
+    const mockToken = 'mock_jwt_' + resolvedKey + '_' + Date.now();
+    completeOAuthLogin(mockToken, targetProfile, resolvedKey);
     return targetProfile;
   }, [completeOAuthLogin]);
 
@@ -190,27 +235,32 @@ export function AuthProvider({ children }) {
     } finally {
       localStorage.removeItem('gt_token');
       localStorage.removeItem('gt_user');
+      localStorage.removeItem('gt_active_pov');
       setToken(null);
       setUser(null);
     }
   }, []);
 
-  // Computed role helpers
-  const isAdmin = useMemo(() => {
-    return user?.role === 'admin' || user?.email === 'parthpanchal1933@gmail.com';
-  }, [user]);
-
+  // Computed role helpers based on strict active POV
   const isStudent = useMemo(() => {
-    return user?.role === 'student' || user?.email === 'parthpanchal1932@gmail.com';
-  }, [user]);
+    return activePov === 'student' || (!['admin', 'organizer', 'mentor'].includes(activePov) && user?.role === 'student');
+  }, [activePov, user]);
 
   const isOrganizer = useMemo(() => {
-    return user?.role === 'organizer' || isAdmin;
-  }, [user, isAdmin]);
+    return activePov === 'organizer' || activePov === 'institution' || user?.role === 'organizer';
+  }, [activePov, user]);
+
+  const isMentor = useMemo(() => {
+    return activePov === 'mentor' || user?.role === 'mentor';
+  }, [activePov, user]);
+
+  const isAdmin = useMemo(() => {
+    return activePov === 'admin' || user?.role === 'admin';
+  }, [activePov, user]);
 
   const isInstitution = useMemo(() => {
-    return user?.role === 'institution' || isAdmin;
-  }, [user, isAdmin]);
+    return isOrganizer || isAdmin;
+  }, [isOrganizer, isAdmin]);
 
   return (
     <AuthContext.Provider
@@ -218,14 +268,16 @@ export function AuthProvider({ children }) {
         user,
         token,
         loading,
+        activePov,
         completeOAuthLogin,
         switchPOV,
         updateUser,
         logout,
         refreshUser: fetchUser,
-        isAdmin,
         isStudent,
         isOrganizer,
+        isMentor,
+        isAdmin,
         isInstitution,
       }}
     >

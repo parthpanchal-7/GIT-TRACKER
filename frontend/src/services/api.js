@@ -69,7 +69,6 @@ export const leaderboardAPI = {
   getPublicHistory: (enrollmentId, limit = 26) => api.get(`/api/leaderboard/${enrollmentId}/history`, { params: { limit } }),
 };
 
-
 // ─── Hackathon & Integrity Auditor ───
 export const hackathonAPI = {
   getEvent: () => api.get('/api/hackathon/event'),
@@ -77,8 +76,12 @@ export const hackathonAPI = {
   getTeams: () => api.get('/api/hackathon/teams'),
   registerTeam: (data) => api.post('/api/hackathon/teams', data),
   auditRepo: (data) => api.post('/api/hackathon/audit-repo', data),
+  getState: () => api.get('/api/hackathon/state'),
+  saveState: (data) => api.post('/api/hackathon/state', data),
+  updateTeam: (id, data) => api.patch(`/api/hackathon/teams/${id}`, data),
+  postAnnouncement: (data) => api.post('/api/hackathon/announcements', data),
+  publishResults: (data) => api.post('/api/hackathon/publish-results', data),
 };
-
 
 // ─── Admin & Anomaly Queue ───
 export const adminAPI = {
