@@ -39,6 +39,15 @@ export default function LoginPage() {
     }
   }, [location.search]);
 
+  const handleQuickSwitch = async (povKey) => {
+    try {
+      await switchPOV(povKey);
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Could not switch POV: ' + err.message);
+    }
+  };
+
   const handleGoogleLogin = async () => {
     setError('');
     setGoogleLoading(true);
@@ -288,6 +297,99 @@ export default function LoginPage() {
               </svg>
               <span>{googleLoading ? 'Connecting to Google...' : 'Continue with Google'}</span>
             </button>
+
+            {/* ── MENTOR DEMO 1-CLICK INSTANT POV QUICK-SWITCH ── */}
+            <div style={{
+              marginTop: 22,
+              padding: '16px',
+              borderRadius: 14,
+              background: 'rgba(191, 245, 73, 0.05)',
+              border: '1px solid rgba(191, 245, 73, 0.25)',
+            }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: 12,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 13 }}>⚡</span>
+                  <span style={{
+                    fontFamily: 'var(--font-label)', fontSize: 11, fontWeight: 800,
+                    color: 'var(--brand-lime, #BFF549)', letterSpacing: '0.06em', textTransform: 'uppercase',
+                  }}>
+                    Mentor Demo Quick-Switch
+                  </span>
+                </div>
+                <span style={{ fontSize: 10, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+                  1:00 PM Live Showcase
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => handleQuickSwitch('student')}
+                  style={{
+                    padding: '10px 10px', borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#BFF549', marginBottom: 2 }}>👨‍🎓 Student POV</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    parthpanchal1932@gmail.com
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickSwitch('admin')}
+                  style={{
+                    padding: '10px 10px', borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#ff716c', marginBottom: 2 }}>⚡ Admin POV</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    parthpanchal1933@gmail.com
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickSwitch('organizer')}
+                  style={{
+                    padding: '10px 10px', borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#81ecff', marginBottom: 2 }}>🏆 Organizer POV</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    Hackathon Suite
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickSwitch('institution')}
+                  style={{
+                    padding: '10px 10px', borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-primary)', textAlign: 'left', cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#d674ff', marginBottom: 2 }}>🏛️ Institution POV</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    Dean Cohorts
+                  </div>
+                </button>
+              </div>
+            </div>
 
             {/* Feature reassurance badges */}
             <div style={{

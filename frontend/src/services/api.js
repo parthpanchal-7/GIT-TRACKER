@@ -39,6 +39,7 @@ export const authAPI = {
   getGoogleUrl: () => api.get('/auth/google'),
   getGithubUrl: () => api.get('/auth/github'),
   getGithubAppInstallUrl: () => api.get('/auth/github/app/install'),
+  demoSwitch: (pov) => api.post('/auth/demo-switch', { pov }),
 };
 
 // ─── Student ───

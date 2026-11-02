@@ -424,7 +424,7 @@ export function ProgressBar({ value, max = 100, size = 'default' }) {
 export function Avatar({ src, alt, size = 'default', tier }) {
   const sizeClass = size === 'lg' ? 'avatar--lg' : size === 'sm' ? 'avatar--sm' : '';
   const ringClass = tier ? `avatar-ring avatar-ring--${tier.toLowerCase()}` : '';
-  
+
   const img = (
     <img
       className={`avatar ${sizeClass}`}
