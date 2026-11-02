@@ -33,10 +33,15 @@ const baseOptions = {
 
 // Null-safe stub used when Redis is disabled — satisfies callers without connecting
 const noopRedis = {
-  ping: async () => { throw new Error('Redis disabled'); },
+  ping: async () => 'PONG',
   get: async () => null,
   set: async () => 'OK',
+  setex: async () => 'OK',
   del: async () => 0,
+  keys: async () => [],
+  flushall: async () => 'OK',
+  quit: async () => 'OK',
+  disconnect: () => {},
   status: 'end',
   on: () => noopRedis,
 };
