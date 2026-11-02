@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Logo, ThemeToggle } from '../components/ui';
 
 /* ── Animated star particles ── */
 function Particles() {
@@ -191,7 +192,7 @@ export default function LandingPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #04060f 0%, #090e1c 40%, #0d1323 100%)',
+      background: 'var(--bg-canvas, #04060f)',
       color: 'var(--on-surface)', fontFamily: 'var(--font-body)',
       position: 'relative', overflowX: 'hidden',
     }}>
@@ -241,7 +242,8 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <ThemeToggle compact />
           {user ? (
             <button onClick={() => navigate('/dashboard')} style={{
               padding: '8px 22px', borderRadius: 10, border: 'none', cursor: 'pointer',

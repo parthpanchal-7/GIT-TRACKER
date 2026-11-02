@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { CosmicBackground } from './components/ui';
 import Sidebar from './components/Sidebar';
 import LoginPage from './pages/LoginPage';
@@ -64,35 +65,37 @@ function PublicRoute() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Landing page — public at /Home, /home, and / */}
-          <Route path="/Home" element={<LandingPage />} />
-          <Route path="/home" element={<Navigate to="/Home" replace />} />
-          <Route path="/" element={<Navigate to="/Home" replace />} />
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
+            {/* Landing page — public at /Home, /home, and / */}
+            <Route path="/Home" element={<LandingPage />} />
+            <Route path="/home" element={<Navigate to="/Home" replace />} />
+            <Route path="/" element={<Navigate to="/Home" replace />} />
 
-          {/* Google OAuth callback */}
-          <Route path="/login/google/callback" element={<GoogleOAuthCallbackPage />} />
+            {/* Google OAuth callback */}
+            <Route path="/login/google/callback" element={<GoogleOAuthCallbackPage />} />
 
-          {/* Public routes */}
-          <Route element={<PublicRoute />}>
-            <Route path="/login" element={<LoginPage />} />
-          </Route>
+            {/* Public routes */}
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<LoginPage />} />
+            </Route>
 
-          {/* Protected routes */}
-          <Route element={<ProtectedLayout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/leaderboard" element={<LeaderboardPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/hackathon" element={<HackathonPage />} />
-            <Route path="/anti-cheat" element={<AntiCheatPage />} />
-          </Route>
+            {/* Protected routes */}
+            <Route element={<ProtectedLayout />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/leaderboard" element={<LeaderboardPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/hackathon" element={<HackathonPage />} />
+              <Route path="/anti-cheat" element={<AntiCheatPage />} />
+            </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/Home" replace />} />
-        </Routes>
-      </AuthProvider>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/Home" replace />} />
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
