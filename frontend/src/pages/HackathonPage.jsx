@@ -222,7 +222,7 @@ export default function HackathonPage() {
     triggerToast('✓ Hackathon Event parameters updated');
     try {
       await hackathonAPI.updateEvent(eventForm);
-    } catch {}
+    } catch { }
   };
 
   // Register New Team
@@ -256,7 +256,7 @@ export default function HackathonPage() {
 
     try {
       await hackathonAPI.registerTeam(newTeam);
-    } catch {}
+    } catch { }
   };
 
   // Run Integrity Audit on a Team
