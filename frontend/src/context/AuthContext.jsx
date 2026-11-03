@@ -11,10 +11,10 @@ export const DEMO_POVS = {
     branch: 'Computer Science',
     year: 2,
     college: 'Madhav Institute of Technology & Science (MITS)',
-    score: 7850,
-    tierRank: 'Gold',
-    githubConnected: true,
-    githubUsername: 'parthpanchal-7',
+    score: 0,
+    tierRank: 'Unranked',
+    githubConnected: false,
+    githubUsername: '',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
     bio: 'CS Undergrad building developer tooling and real-time contribution scoring systems.',
   },
@@ -27,10 +27,10 @@ export const DEMO_POVS = {
     branch: 'Events & Academic Governance',
     year: 4,
     college: 'Madhav Institute of Technology & Science (MITS)',
-    score: 8900,
-    tierRank: 'Platinum',
-    githubConnected: true,
-    githubUsername: 'parthpanchal-7',
+    score: 0,
+    tierRank: 'Unranked',
+    githubConnected: false,
+    githubUsername: '',
     avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
     bio: 'Merged Hackathon Organizer and Institution Dean managing event integrity and cohort telemetry.',
   },
@@ -43,10 +43,10 @@ export const DEMO_POVS = {
     branch: 'Computer Science & Engineering',
     year: 4,
     college: 'MITS Evaluation Committee',
-    score: 9200,
-    tierRank: 'Platinum',
-    githubConnected: true,
-    githubUsername: 'sk-sharma-prof',
+    score: 0,
+    tierRank: 'Unranked',
+    githubConnected: false,
+    githubUsername: '',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
     bio: 'Senior Technical Evaluator inspecting team AST regularity, commit timelines, and rubric scoring.',
   },
@@ -59,10 +59,10 @@ export const DEMO_POVS = {
     branch: 'System Architecture',
     year: 4,
     college: 'MITS Gwalior / Central Administration',
-    score: 9950,
-    tierRank: 'Elite',
-    githubConnected: true,
-    githubUsername: 'parthpanchal-7',
+    score: 0,
+    tierRank: 'Unranked',
+    githubConnected: false,
+    githubUsername: '',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
     bio: 'Platform architect managing campus scoring rubrics, anti-cheat models, and event infrastructure.',
   },
@@ -76,10 +76,10 @@ export const DEMO_POVS = {
     branch: 'Events & Academic Governance',
     year: 4,
     college: 'Madhav Institute of Technology & Science (MITS)',
-    score: 8900,
-    tierRank: 'Platinum',
-    githubConnected: true,
-    githubUsername: 'parthpanchal-7',
+    score: 0,
+    tierRank: 'Unranked',
+    githubConnected: false,
+    githubUsername: '',
     avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
     bio: 'Merged Hackathon Organizer and Institution Dean managing event integrity and cohort telemetry.',
   },
@@ -192,19 +192,24 @@ export function AuthProvider({ children }) {
     setActivePov(resolvedKey);
     localStorage.setItem('gt_active_pov', resolvedKey);
 
+    let activeUser = targetProfile;
     try {
       const res = await authAPI.demoSwitch(resolvedKey);
       if (res.data?.token && res.data?.student) {
         completeOAuthLogin(res.data.token, res.data.student, resolvedKey);
-        return res.data.student;
+        activeUser = res.data.student;
+      } else {
+        const mockToken = 'mock_jwt_' + resolvedKey + '_' + Date.now();
+        completeOAuthLogin(mockToken, targetProfile, resolvedKey);
       }
     } catch {
-      // Offline / ephemeral fallback
+      const mockToken = 'mock_jwt_' + resolvedKey + '_' + Date.now();
+      completeOAuthLogin(mockToken, targetProfile, resolvedKey);
     }
 
-    const mockToken = 'mock_jwt_' + resolvedKey + '_' + Date.now();
-    completeOAuthLogin(mockToken, targetProfile, resolvedKey);
-    return targetProfile;
+    // Always dispatch global POV switch event so all listening pages reset immediately to zero
+    window.dispatchEvent(new CustomEvent('gt_pov_switched', { detail: { pov: resolvedKey, user: activeUser } }));
+    return activeUser;
   }, [completeOAuthLogin]);
 
   // Update profile

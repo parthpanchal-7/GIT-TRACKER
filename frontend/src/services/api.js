@@ -48,6 +48,7 @@ export const studentAPI = {
   updateProfile: (data) => api.patch('/api/student/profile', data),
   getScoreExplanation: () => api.get('/api/student/score-explanation'),
   getSyncStatus: () => api.get('/api/student/sync-status'),
+  connectGithub: (data) => api.post('/api/student/github/connect', data),
   disconnectGithub: () => api.post('/api/student/github/disconnect'),
   getPublicProfile: (enrollmentId) => api.get(`/api/student/${enrollmentId}`),
   getPublicExplanation: (enrollmentId) => api.get(`/api/student/${enrollmentId}/score-explanation`),

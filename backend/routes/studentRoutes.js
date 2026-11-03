@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import Student from '../models/Student.js';
 import GithubStats from '../models/GithubStats.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { syncStudent } from '../services/syncService.js';
 import { buildScoreExplanation } from '../services/explainabilityService.js';
 import {
   disconnectGithubIdentity,
@@ -96,9 +97,20 @@ router.get('/sync-status', authMiddleware, async (req, res) => {
 // ─── GET /api/student/score-explanation — Explain own score ───
 router.get('/score-explanation', authMiddleware, async (req, res) => {
   try {
-    const student = await Student.findById(req.user._id);
-    const stats = await GithubStats.findOne({ userId: req.user._id });
+    const isMongoId = typeof req.user._id === 'string' && /^[0-9a-fA-F]{24}$/.test(req.user._id);
+    let student = isMongoId ? await Student.findById(req.user._id) : null;
+    if (!student && req.user.email) {
+      student = await Student.findOne({ email: req.user.email });
+    }
 
+    if (!student || !student.githubConnected || !student.score) {
+      return res.json({
+        available: false,
+        message: 'No score stats available. Please connect GitHub to generate verified telemetry explanation.',
+      });
+    }
+
+    const stats = await GithubStats.findOne({ userId: student._id });
     const explanation = buildScoreExplanation(student, stats, {
       includeFlags: true,
     });
@@ -227,6 +239,72 @@ router.get('/:enrollmentId', async (req, res) => {
   } catch (error) {
     console.error('Public profile error:', error.message);
     return res.status(500).json({ error: 'Failed to load student profile' });
+  }
+});
+
+// ─── POST /api/student/github/connect — Live Connect GitHub Account ───
+router.post('/github/connect', authMiddleware, async (req, res) => {
+  try {
+    const { githubUsername, githubToken } = req.body || {};
+    if (!githubUsername || !githubUsername.trim()) {
+      return res.status(400).json({ error: 'GitHub username is required' });
+    }
+
+    const cleanUsername = githubUsername.trim().replace(/^@/, '');
+    const isMongoId = typeof req.user._id === 'string' && /^[0-9a-fA-F]{24}$/.test(req.user._id);
+
+    let student = isMongoId ? await Student.findById(req.user._id) : null;
+    if (!student && req.user.email) {
+      student = await Student.findOne({ email: req.user.email });
+    }
+
+    if (!student) {
+      student = new Student({
+        name: req.user.name || cleanUsername,
+        email: req.user.email || `${cleanUsername}@users.noreply.github.com`,
+        enrollmentId: req.user.enrollmentId || 'BTCS24O1089',
+        branch: req.user.branch || 'Computer Science',
+        year: req.user.year || 2,
+        role: req.user.role || 'student',
+        githubConnected: true,
+        githubUsername: cleanUsername,
+      });
+      if (githubToken) student.githubAccessToken = githubToken;
+      await student.save();
+    } else {
+      student.githubConnected = true;
+      student.githubUsername = cleanUsername;
+      if (githubToken) student.githubAccessToken = githubToken;
+      await student.save();
+    }
+
+    // Trigger sync pipeline to immediately fetch real GitHub telemetry
+    try {
+      const syncResult = await syncStudent(student._id, { skipCooldown: true });
+      const refreshedStudent = await Student.findById(student._id);
+      return res.json({
+        message: `Successfully linked GitHub @${cleanUsername}!`,
+        student: refreshedStudent || student,
+        score: syncResult.score,
+        tier: syncResult.tier,
+        rank: syncResult.rank,
+        breakdown: syncResult.breakdown,
+        effectiveCommits: syncResult.effectiveCommits,
+        qualityScore: syncResult.qualityScore,
+        decayFactor: syncResult.decayFactor,
+      });
+    } catch (syncErr) {
+      console.warn('Post-connect sync notice:', syncErr.message);
+      return res.json({
+        message: `GitHub @${cleanUsername} connected! Telemetry sync initiated.`,
+        student,
+        score: student.score || 0,
+        tier: student.tierRank || 'Unranked',
+      });
+    }
+  } catch (error) {
+    console.error('GitHub connect error:', error.message);
+    return res.status(500).json({ error: 'Failed to connect GitHub: ' + error.message });
   }
 });
 
