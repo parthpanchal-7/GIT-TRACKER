@@ -381,10 +381,20 @@ router.get('/github/callback', async (req, res) => {
 // ─── GET /auth/me — Current student profile ───
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const student = await Student.findById(req.user._id);
-    return res.json({ student });
+    const isMongoId = typeof req.user._id === 'string' && /^[0-9a-fA-F]{24}$/.test(req.user._id);
+    if (!isMongoId || req.user.isDemoUser) {
+      return res.json({ student: req.user });
+    }
+    let student = await Student.findById(req.user._id);
+    if (!student && req.user.email) {
+      student = await Student.findOne({ email: req.user.email });
+    }
+    return res.json({ student: student || req.user });
   } catch (error) {
     console.error('Get profile error:', error.message);
+    if (req.user) {
+      return res.json({ student: req.user });
+    }
     return res.status(500).json({ error: 'Failed to get profile' });
   }
 });
@@ -474,7 +484,7 @@ router.post('/demo-switch', async (req, res) => {
 
     const profile = povProfiles[pov] || povProfiles.student;
     const token = sign(
-      { id: profile.id, email: profile.email, enrollmentId: profile.enrollmentId, role: profile.role, isDemoToken: true },
+      { id: profile.id, email: profile.email, name: profile.name, enrollmentId: profile.enrollmentId, role: profile.role, isDemoToken: true },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '7d' }
     );

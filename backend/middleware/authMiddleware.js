@@ -15,12 +15,15 @@ const authMiddleware = async (req, res, next) => {
     // Support mock mentor demo tokens
     if (token.startsWith('mock_jwt_')) {
       const isSuperAdmin = token.includes('admin') || token.includes('1933');
+      const isMentor = token.includes('mentor');
+      const isOrganizer = token.includes('organizer');
       req.user = {
         _id: 'usr_demo_' + Date.now(),
-        email: isSuperAdmin ? 'parthpanchal1933@gmail.com' : 'parthpanchal1932@gmail.com',
-        name: isSuperAdmin ? 'Parth Panchal (Admin)' : 'Parth Panchal (Student)',
-        role: isSuperAdmin ? 'admin' : 'student',
-        enrollmentId: isSuperAdmin ? 'ADMIN-SUPER' : 'BTCS24O1089',
+        email: isSuperAdmin ? 'parthpanchal1933@gmail.com' : isMentor ? 'dr.sharma@mits.ac.in' : isOrganizer ? 'parthpanchal1933@gmail.com' : 'parthpanchal1932@gmail.com',
+        name: isSuperAdmin ? 'Parth Panchal (Admin)' : isMentor ? 'Dr. S. K. Sharma (Mentor)' : isOrganizer ? 'Parth Panchal (Organizer)' : 'Parth Panchal (Student)',
+        role: isSuperAdmin ? 'admin' : isMentor ? 'mentor' : isOrganizer ? 'organizer' : 'student',
+        enrollmentId: isSuperAdmin ? 'ADMIN-SUPER' : isMentor ? 'MTR-TECH-04' : isOrganizer ? 'ORG-INST-2026' : 'BTCS24O1089',
+        isDemoUser: true,
       };
       return next();
     }
@@ -34,6 +37,7 @@ const authMiddleware = async (req, res, next) => {
         name: decoded.name || 'Demo User',
         role: decoded.role || (decoded.email === 'parthpanchal1933@gmail.com' ? 'admin' : 'student'),
         enrollmentId: decoded.enrollmentId || 'DEMO2026',
+        isDemoUser: true,
       };
       return next();
     }
