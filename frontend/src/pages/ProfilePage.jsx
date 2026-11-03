@@ -10,33 +10,33 @@ function formatNumber(n) {
   return n.toLocaleString();
 }
 
-const DEFAULT_EXPLANATION = {
+const ZERO_EXPLANATION = {
   available: true,
-  rank: { score: 8420, tierRank: 'Elite', leaderboardRank: 1 },
+  rank: { score: 0, tierRank: 'Unranked', leaderboardRank: '—' },
   formula: {
     scoreVersion: 'v4.2-cqe-decay',
-    rawTotal: 9680,
-    totalAfterDecay: 8520,
-    totalScore: 8420,
-    qualityScore: 0.88,
-    effectiveCommits: 1420,
+    rawTotal: 0,
+    totalAfterDecay: 0,
+    totalScore: 0,
+    qualityScore: 0,
+    effectiveCommits: 0,
     components: {
-      PAS: 4200,
-      OCS: 3100,
-      PIS: 1250,
-      CIS: 950,
-      SDS: 180,
+      PAS: 0,
+      OCS: 0,
+      PIS: 0,
+      CIS: 0,
+      SDS: 0,
     },
     qualityBreakdown: {
-      volumeScore: 0.92,
-      diversityScore: 0.78,
-      prAssociationScore: 0.85,
-      antiSpamScore: 0.95,
+      volumeScore: 0,
+      diversityScore: 0,
+      prAssociationScore: 0,
+      antiSpamScore: 0,
       weights: { volume: 0.3, diversity: 0.25, prAssociation: 0.25, antiSpam: 0.2 },
     },
     decay: {
-      daysSinceActivity: 2,
-      decayFactor: 0.96,
+      daysSinceActivity: 0,
+      decayFactor: 1.0,
       expression: 'decay_factor = 1 / log(days_since + 2) with safety clamp [0.2, 1.0]',
     },
   },
@@ -58,27 +58,36 @@ const DEFAULT_EXPLANATION = {
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [explanation, setExplanation] = useState(DEFAULT_EXPLANATION);
+  const [explanation, setExplanation] = useState(ZERO_EXPLANATION);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    let active = true;
-    const fetchExplanation = async () => {
-      setLoading(true);
-      try {
-        const res = await studentAPI.getScoreExplanation();
-        if (active && res?.data?.available) {
-          setExplanation(res.data);
-        }
-      } catch {
-        // Fallback to rich default explanation
-      } finally {
-        if (active) setLoading(false);
+  const fetchExplanation = async () => {
+    setLoading(true);
+    try {
+      const res = await studentAPI.getScoreExplanation();
+      if (res?.data?.available) {
+        setExplanation(res.data);
+      } else {
+        setExplanation(ZERO_EXPLANATION);
       }
-    };
+    } catch {
+      setExplanation(ZERO_EXPLANATION);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchExplanation();
-    return () => { active = false; };
-  }, []);
+
+    const handlePovSwitch = () => {
+      setExplanation(ZERO_EXPLANATION);
+      fetchExplanation();
+    };
+
+    window.addEventListener('gt_pov_switched', handlePovSwitch);
+    return () => window.removeEventListener('gt_pov_switched', handlePovSwitch);
+  }, [user?.email, user?.githubUsername]);
 
   const p = user;
   const ex = explanation;
@@ -143,10 +152,10 @@ export default function ProfilePage() {
               fontFamily: 'var(--font-mono)', fontSize: 32, fontWeight: 800,
               color: '#BFF549', lineHeight: 1.1,
             }}>
-              {formatNumber(ex.rank?.score || p?.score || 8420)}
+              {formatNumber(ex.rank?.score || p?.score || 0)}
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', marginTop: 6 }}>
-              <TierBadge tier={ex.rank?.tierRank || p?.tierRank || 'Elite'} />
+              <TierBadge tier={ex.rank?.tierRank || p?.tierRank || 'Unranked'} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--on-surface-variant)' }}>
                 Rank #{ex.rank?.leaderboardRank || 1}
               </span>

@@ -12,18 +12,19 @@ const router = Router();
 // ─── POST /api/sync — Execute real-time sync with queue fallback ───
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    let student = req.user;
+    const isMongoId = typeof req.user._id === 'string' && /^[0-9a-fA-F]{24}$/.test(req.user._id);
+    let student = isMongoId ? await Student.findById(req.user._id) : null;
+    if (!student && req.user.email) {
+      student = await Student.findOne({ email: req.user.email });
+    }
+    if (!student) {
+      student = req.user;
+    }
 
-    // Auto-connect if student has githubUsername set but githubConnected flag was false
-    if (!student.githubConnected && student.githubUsername) {
-      await Student.findByIdAndUpdate(student._id, { githubConnected: true });
-      student.githubConnected = true;
-    } else if (!student.githubConnected && !student.githubUsername) {
-      // Set default demo github username if empty
-      const defaultUser = student.email?.includes('1933') ? 'parthpanchal-7' : 'parthpanchal-7';
-      await Student.findByIdAndUpdate(student._id, { githubConnected: true, githubUsername: defaultUser });
-      student.githubConnected = true;
-      student.githubUsername = defaultUser;
+    if (!student.githubConnected || !student.githubUsername) {
+      return res.status(400).json({
+        error: 'Please connect your GitHub account first to sync telemetry and calculate your score.'
+      });
     }
 
     const isQueueDisabled =
@@ -45,17 +46,16 @@ router.post('/', authMiddleware, async (req, res) => {
         });
       } catch (directErr) {
         console.warn('[SyncRoute] Direct sync warning:', directErr.message);
-        // Fallback: update lastSyncedAt and return current student data
         const updated = await Student.findByIdAndUpdate(
           student._id,
           { lastSyncedAt: new Date() },
           { new: true }
         );
         return res.json({
-          message: 'GitHub synchronization verified',
+          message: 'GitHub synchronization updated',
           status: 'completed',
-          score: updated.score || 8420,
-          tier: updated.tierRank || 'Elite',
+          score: updated?.score || 0,
+          tier: updated?.tierRank || 'Unranked',
         });
       }
     }
@@ -91,8 +91,18 @@ router.post('/', authMiddleware, async (req, res) => {
 // ─── GET /api/sync/status — Live sync telemetry & score details ───
 router.get('/status', authMiddleware, async (req, res) => {
   try {
-    const student = await Student.findById(req.user._id);
-    const stats = await GithubStats.findOne({ userId: req.user._id });
+    const isMongoId = typeof req.user._id === 'string' && /^[0-9a-fA-F]{24}$/.test(req.user._id);
+    let student = isMongoId ? await Student.findById(req.user._id) : null;
+    if (!student && req.user.email) {
+      student = await Student.findOne({ email: req.user.email });
+    }
+    if (!student) {
+      student = req.user;
+    }
+
+    const stats = (student?._id && /^[0-9a-fA-F]{24}$/.test(student._id.toString()))
+      ? await GithubStats.findOne({ userId: student._id })
+      : null;
 
     const cooldownMs = (parseInt(process.env.SYNC_COOLDOWN_MINUTES) || 30) * 60 * 1000;
     const canSync =
@@ -102,37 +112,54 @@ router.get('/status', authMiddleware, async (req, res) => {
       ? new Date(new Date(student.lastSyncedAt).getTime() + cooldownMs)
       : null;
 
+    const isConnected = Boolean(student.githubConnected && student.githubUsername);
+    const scoreVal = isConnected ? (student.score || 0) : 0;
+
     return res.json({
-      lastSyncedAt: student.lastSyncedAt || new Date(),
+      lastSyncedAt: student.lastSyncedAt || null,
       canSync,
       nextAllowedAt,
-      hasStats: !!stats,
-      score: student.score || 8420,
-      tierRank: student.tierRank || 'Elite',
-      leaderboardRank: student.leaderboardRank || 1,
+      githubConnected: isConnected,
+      githubUsername: student.githubUsername || '',
+      hasStats: isConnected && !!stats,
+      score: scoreVal,
+      tierRank: isConnected ? (student.tierRank || 'Bronze') : 'Unranked',
+      leaderboardRank: isConnected ? (student.leaderboardRank || '—') : '—',
       fromCache: stats?.fromCache || false,
-      stats: stats ? {
-        commits: stats.commits,
-        prsOpened: stats.prsOpened,
-        prsMergedExternal: stats.prsMergedExternal,
-        issues: stats.issues,
-        codeReviews: stats.codeReviews,
-        totalRepoCount: stats.totalRepoCount,
-        stars: stats.stars,
-        languageCount: stats.languageCount,
-        streakDays: stats.streakDays,
-        contributionsLast30Days: stats.contributionsLast30Days,
+      stats: isConnected && stats ? {
+        commits: stats.commits || 0,
+        prsOpened: stats.prsOpened || 0,
+        prsMergedExternal: stats.prsMergedExternal || 0,
+        issues: stats.issues || 0,
+        codeReviews: stats.codeReviews || 0,
+        totalRepoCount: stats.totalRepoCount || 0,
+        stars: stats.stars || 0,
+        languageCount: stats.languageCount || 0,
+        streakDays: stats.streakDays || 0,
+        contributionsLast30Days: stats.contributionsLast30Days || 0,
         languages: stats.languages || [],
-      } : null,
-      breakdown: stats?.scoreBreakdown || {
-        PAS: Math.round((student.score || 8420) * 0.45),
-        OCS: Math.round((student.score || 8420) * 0.32),
-        PIS: Math.round((student.score || 8420) * 0.14),
-        CIS: Math.round((student.score || 8420) * 0.07),
-        SDS: Math.round((student.score || 8420) * 0.02),
+      } : {
+        commits: 0,
+        prsOpened: 0,
+        prsMergedExternal: 0,
+        issues: 0,
+        codeReviews: 0,
+        totalRepoCount: 0,
+        stars: 0,
+        languageCount: 0,
+        streakDays: 0,
+        contributionsLast30Days: 0,
+        languages: [],
       },
-      qualityScore: stats?.qualityScore || 0.88,
-      decayFactor: stats?.decayFactor || 0.96,
+      breakdown: isConnected && stats?.scoreBreakdown ? stats.scoreBreakdown : {
+        PAS: 0,
+        OCS: 0,
+        PIS: 0,
+        CIS: 0,
+        SDS: 0,
+      },
+      qualityScore: isConnected && stats?.qualityScore ? stats.qualityScore : 0,
+      decayFactor: isConnected && stats?.decayFactor ? stats.decayFactor : 1.0,
       webhookStats: student.githubWebhookStats || {},
     });
   } catch (error) {

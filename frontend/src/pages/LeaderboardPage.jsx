@@ -15,22 +15,7 @@ const TIERS = ['All', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Elite'];
 
 // Rich student directory
 const MOCK_LEADERBOARD = [
-  {
-    _id: 'std-parth',
-    name: 'Parth Panchal',
-    email: 'parthpanchal1932@gmail.com',
-    githubUsername: 'parthpanchal-7',
-    enrollmentId: '0901CS211074',
-    college: 'MITS Gwalior',
-    department: 'CSE',
-    year: '4th Year',
-    score: 8420,
-    tierRank: 'Elite',
-    isMe: true,
-    weeklyDelta: '+18%',
-    lastActiveDays: 0,
-    avatar: 'https://avatars.githubusercontent.com/u/108927904?v=4',
-  },
+
   {
     _id: 'comm-1',
     name: 'Priya Sharma',
@@ -139,7 +124,7 @@ const MOCK_LEADERBOARD = [
 ];
 
 export default function LeaderboardPage() {
-  const { user } = useAuth();
+  const { user, activePov, isOrganizer, isAdmin, isInstitution } = useAuth();
   const [selectedCollege, setSelectedCollege] = useState('Global');
   const [selectedDept, setSelectedDept] = useState('All');
   const [selectedYear, setSelectedYear] = useState('All');
@@ -147,7 +132,7 @@ export default function LeaderboardPage() {
   const [dbStudents, setDbStudents] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const isInstitutionView = user?.role === 'institution' || user?.role === 'admin' || user?.email?.includes('institution');
+  const isInstitutionView = isOrganizer || isAdmin || isInstitution || activePov === 'organizer' || activePov === 'admin';
 
   // Fetch real students from API if available
   useEffect(() => {
@@ -179,19 +164,19 @@ export default function LeaderboardPage() {
     if (!exists && user) {
       list.push({
         _id: user._id || 'user-current',
-        name: user.name || 'Parth Panchal',
+        name: user.name || 'Developer',
         email: user.email,
-        githubUsername: user.githubUsername || 'parthpanchal-7',
-        enrollmentId: user.enrollmentId || '0901CS211074',
-        college: 'MITS Gwalior',
-        department: 'CSE',
-        year: '4th Year',
-        score: user.score || 8420,
-        tierRank: user.tierRank || 'Elite',
+        githubUsername: user.githubUsername || '',
+        enrollmentId: user.enrollmentId || 'BTCS24O1089',
+        college: user.college || 'MITS Gwalior',
+        department: user.branch || 'CSE',
+        year: user.year ? `${user.year}th Year` : '2nd Year',
+        score: user.score || 0,
+        tierRank: user.score > 0 ? (user.tierRank || 'Bronze') : 'Unranked',
         isMe: true,
-        weeklyDelta: '+18%',
-        lastActiveDays: 0,
-        avatar: user.avatar || user.picture || 'https://avatars.githubusercontent.com/u/108927904?v=4',
+        weeklyDelta: user.score > 0 ? '+12%' : '0%',
+        lastActiveDays: user.score > 0 ? 0 : 30,
+        avatar: user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
       });
     }
 
@@ -233,17 +218,19 @@ export default function LeaderboardPage() {
 
   // Find the pinned user record
   const pinnedUser = useMemo(() => {
-    return filteredStudents.find(s => s.isMe) || {
-      name: user?.name || 'Parth Panchal',
-      enrollmentId: '0901CS211074',
-      college: 'MITS Gwalior',
-      department: 'CSE',
-      year: '4th Year',
-      score: user?.score || 8420,
-      tierRank: user?.tierRank || 'Elite',
-      displayRank: 2,
+    const found = filteredStudents.find(s => s.isMe);
+    if (found) return found;
+    return {
+      name: user?.name || 'Developer',
+      enrollmentId: user?.enrollmentId || 'BTCS24O1089',
+      college: user?.college || 'MITS Gwalior',
+      department: user?.branch || 'CSE',
+      year: user?.year ? `${user.year}th Year` : '2nd Year',
+      score: user?.score || 0,
+      tierRank: user?.score > 0 ? (user?.tierRank || 'Bronze') : 'Unranked',
+      displayRank: user?.score > 0 ? (user?.leaderboardRank || '—') : '—',
       isMe: true,
-      avatar: user?.avatar || 'https://avatars.githubusercontent.com/u/108927904?v=4',
+      avatar: user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
     };
   }, [filteredStudents, user]);
 
